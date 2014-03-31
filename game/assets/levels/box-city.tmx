@@ -4,16 +4,26 @@
   <image source="box-city.png" width="112" height="96"/>
  </tileset>
  <layer name="Floor" width="21" height="13">
+  <properties>
+   <property name="nocollide" value="true"/>
+   <property name="tileset" value="box-city"/>
+  </properties>
   <data encoding="base64" compression="zlib">
    eJzjZ2BgEIBifirRYkAsDsSyUDa5tDgSDTNbBconlxbD4U4BCmj+UXeOupOG7qRGvqSmWfxoZgEAungYHQ==
   </data>
  </layer>
  <layer name="Walls" width="21" height="13">
+  <properties>
+   <property name="tileset" value="box-city"/>
+  </properties>
   <data encoding="base64" compression="zlib">
    eJxTZGBgUAJiQSAWgtL42MhiQmjywkAsAsQaQKzJQB0gBcTSQCzJwNCgABXjoJCWgJiHYialAJuZo+4cdedgdacaAyTfqiGxsWE1LGpgbJiZAISiDyQ=
   </data>
  </layer>
  <layer name="SoftWalls" width="21" height="13">
+  <properties>
+   <property name="tileset" value="box-city"/>
+  </properties>
   <data encoding="base64" compression="zlib">
    eJxjYKA9YCQDE2MmNj46TY778JlLjB5i3EOO+8kNR3LcSYjG5Q9i3UlIHSF3EnI/Lv243EmsHLrbcQFS450YQEr4EZuPqAEA6MAAag==
   </data>
