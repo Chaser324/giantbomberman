@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="21" height="13" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="box-city" tilewidth="16" tileheight="16">
+  <image source="box-city.png" width="112" height="96"/>
+ </tileset>
+ <layer name="Floor" width="21" height="13">
+  <data encoding="base64" compression="zlib">
+   eJzjZ2BgEIBifirRYkAsDsSyUDa5tDgSDTNbBconlxbD4U4BCmj+UXeOupOG7qRGvqSmWfxoZgEAungYHQ==
+  </data>
+ </layer>
+ <layer name="Walls" width="21" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxTZGBgUAJiQSAWgtL42MhiQmjywkAsAsQaQKzJQB0gBcTSQCzJwNCgABXjoJCWgJiHYialAJuZo+4cdedgdacaAyTfqiGxsWE1LGpgbJiZAISiDyQ=
+  </data>
+ </layer>
+ <layer name="SoftWalls" width="21" height="13">
+  <data encoding="base64" compression="zlib">
+   eJxjYKA9YCQDE2MmNj46TY778JlLjB5i3EOO+8kNR3LcSYjG5Q9i3UlIHSF3EnI/Lv243EmsHLrbcQFS450YQEr4EZuPqAEA6MAAag==
+  </data>
+ </layer>
+ <objectgroup name="Players" width="21" height="13">
+  <object name="Player 1" type="player_start" x="32" y="16" width="16" height="16"/>
+  <object name="Player 2" type="player_start" x="288" y="176" width="16" height="16"/>
+  <object name="Player 3" type="player_start" x="32" y="176" width="16" height="16"/>
+  <object name="Player 4" type="player_start" x="288" y="16" width="16" height="16"/>
+  <object name="Player 5" type="player_start" x="112" y="48" width="16" height="16"/>
+  <object name="Player 6" type="player_start" x="208" y="144" width="16" height="16"/>
+  <object name="Player 7" type="player_start" x="208" y="48" width="16" height="16"/>
+  <object name="Player 8" type="player_start" x="112" y="144" width="16" height="16"/>
+ </objectgroup>
+</map>

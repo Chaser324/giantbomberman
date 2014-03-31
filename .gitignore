@@ -1,0 +1,30 @@
+####################################
+# Build, Release, and Temp Folders
+####################################
+export/
+tmp/
+
+####################################################################################
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
+####################################################################################
+
+##############################
+# SublimeText project files
+##############################
+*.sublime-workspace
+*.sublime-project
+
+###########
+# OS Junk 
+###########
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+$RECYCLE.BIN/
