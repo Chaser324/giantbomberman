@@ -3,6 +3,7 @@
 ####################################
 export/
 tmp/
+demo-site/*.swf
 
 ####################################################################################
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`

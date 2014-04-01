@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rival Bombs Demo</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/app.css" />
+    <link href='http://fonts.googleapis.com/css?family=Vollkorn|Open+Sans:400,300,700,800' rel='stylesheet' type='text/css'>
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-7725763-1']);
+      _gaq.push(['_setDomainName', 'assets.chasepettit.com']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+    <script src="assets/js/swfobject.js"></script>
+    <script>
+        var flashvars = {
+        };
+        var params = {
+            menu: "false",
+            scale: "noScale",
+            allowFullscreen: "true",
+            allowScriptAccess: "always",
+            bgcolor: "",
+            wmode: "direct" // can cause issues with FP settings & webcam
+        };
+        var attributes = {
+            id:"RivalBombs"
+        };
+        swfobject.embedSWF(
+            "RivalBombs.swf", 
+            "altContent", "672", "448", "10.0.0", 
+            "expressInstall.swf", 
+            flashvars, params, attributes);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="span12">
+                <h1>Rival Bombs - Demo Build</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div id="altContent" class="span12">
+                <p><a href="http://www.adobe.com/go/getflashplayer">Get Adobe Flash player</a></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="span4">
+                <h2>Controls</h2>
+            </div>
+            <div class="span8">
+                <ul>
+                <li>Arrow Keys - Move</li>
+                <li>Z - Bomb</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- <div class="row">
+            <div class="span4">
+                <h2>About</h2>
+            </div>
+            <div class="span8">
+                <p><em><strong>segfault</strong></em> is a game currently in development by <a href="https://twitter.com/chasepettit">Chase Pettit</a> as part of the <a href="http://roguebasin.roguelikedevelopment.org/index.php?title=7DRL_Challenge_2013">7DRL Challenge 2013</a> event. It's a fairly traditional roguelike about a software engineer at the Shinroku Corporation, producer of various consumer electronics, fighting to stay alive in the AI apocalypse that occurs when all of the company's products become sentient and strike back against their human oppressors.</p>
+            </div>
+        </div> -->
+
+        <!-- <div class="row">
+            <div class="span4">
+                <h2>Version Info</h2>
+            </div>
+            <div class="span8">
+                <h3>Current Version</h3>
+                <p><strong>2013/17/03 3:30PM EDT</strong> - 7DRL Build. Unbalanced and a few lingering bugs (something with open doors...not sure), but this is it. I have to say that I'm overall pretty happy with it.</p>
+                <h3>Older Versions</h3>
+                <p><strong>2013/15/03 6:45PM EDT</strong> - Modified map generation to be more dense. Added doors. New player sprite. New wall/floor sprites with variation. Refactored to greatly reduce the number of Flashpunk entities (from 1000+ down to about 5).</p>
+                <p><strong>2013/14/03 6:00PM EDT</strong> - "No Gameplay" Demo. Title screen and intro. Basic movement. No enemies or complete UI. Also, it might occasionally freeze after the intro.</p>
+            </div>
+        </div> -->
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

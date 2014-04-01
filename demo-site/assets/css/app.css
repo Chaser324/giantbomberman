@@ -1,0 +1,35 @@
+body {
+	color: #fafafa;
+	background: #111111;
+	font-family: "Open Sans",Arial,sans-serif;
+	padding-bottom: 40px;
+}
+
+h1 {
+	font-weight: 300;
+	text-shadow: 2px 2px 20px rgba(0,0,0,0.7);
+}
+
+h2 {
+	font-weight: 700;
+	margin: 0;
+	border-bottom: 1px solid #fafafa;
+	text-shadow: 2px 2px 20px rgba(0,0,0,0.7);
+	font-size: 18px;
+	line-height: 20px;
+}
+
+h3 {
+	font-weight: 700;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+object {
+	display: block;
+	margin: 30px auto;
+
+	-webkit-box-shadow: 5px 5px 35px rgba(0,0,0,0.7);
+	-mox-box-shadow: 5px 5px 35px rgba(0,0,0,0.7);
+	box-shadow: 5px 5px 35px rgba(0,0,0,0.7);
+}
