@@ -61,6 +61,7 @@ class PlayState extends FlxState
 		
 		FlxG.overlap(explosions, softwalls, overlapExplosionWall);
 		FlxG.overlap(explosions, bombs, overlapExplosionBomb);
+		FlxG.overlap(explosions, players, overlapExplosionPlayer);
 	}
 	
 	public function addBomb(bomber:Player):Bomb
@@ -123,6 +124,29 @@ class PlayState extends FlxState
 		}
 		
 		return retVal;
+	}
+	
+	private function overlapExplosionPlayer(e:Explosion, p:Player)
+	{
+		var testPoints:Array<FlxPoint> = [
+			new FlxPoint(p.x, p.y),
+			new FlxPoint(p.x + 8, p.y),
+			new FlxPoint(p.x + 16, p.y),
+			new FlxPoint(p.x + 16, p.y + 8),
+			new FlxPoint(p.x + 16, p.y + 16),
+			new FlxPoint(p.x + 8, p.y + 16),
+			new FlxPoint(p.x, p.y + 16),
+			new FlxPoint(p.x, p.y + 8),
+		];
+		
+		for (point in testPoints)
+		{
+			if (e.pixelsOverlapPoint(point))
+			{
+				p.kill();
+				break;
+			}
+		}
 	}
 	
 	private function overlapExplosionBomb(e:Explosion, b:Bomb)
