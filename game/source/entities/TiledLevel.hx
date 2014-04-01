@@ -68,7 +68,6 @@ class TiledLevel extends TiledMap
 				if (collidableTileLayers == null)
 					collidableTileLayers = new Array<FlxTilemap>();
 				
-				trace(tileLayer.name);
 				foregroundTiles.add(tilemap);
 				collidableTileLayers.push(tilemap);
 			}
@@ -94,8 +93,7 @@ class TiledLevel extends TiledMap
 		{
 			for (map in collidableTileLayers)
 			{
-				//retVal = FlxG.overlap(map, obj, notifyCallback, processCallback != null ? processCallback : FlxObject.separate) || retVal;
-				FlxG.collide(map, obj);
+				retVal = FlxG.overlap(map, obj, notifyCallback, processCallback != null ? processCallback : FlxObject.separate) || retVal;
 			}
 		}
 		
@@ -117,9 +115,9 @@ class TiledLevel extends TiledMap
 			case "player_start":
 				if (state.players.length > playerCount)
 				{
-					state.players[playerCount].x = x;
-					state.players[playerCount].y = y;
-					state.add(state.players[playerCount]);
+					state.players.members[playerCount];
+					state.players.members[playerCount].x = x;
+					state.players.members[playerCount].y = y;
 					
 					++playerCount;
 				}
