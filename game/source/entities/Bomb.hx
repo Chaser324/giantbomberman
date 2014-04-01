@@ -2,7 +2,7 @@ package entities;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
-import flixel.util.FlxPoint;
+import flixel.tweens.FlxTween;
 
 class Bomb extends FlxSprite
 {
@@ -12,6 +12,8 @@ class Bomb extends FlxSprite
 	private var power:Int = 3;
 	
 	private var elapsed:Float = 0;
+	
+	private var tween:FlxTween;
 	
 	public function new() 
 	{
@@ -23,6 +25,11 @@ class Bomb extends FlxSprite
 		width = 16;
 		
 		immovable = true;
+		
+		offset.x = -1;
+		
+		var tweenOptions:TweenOptions = {type: FlxTween.PINGPONG}
+		tween = FlxTween.multiVar(offset, { x: 1 }, 0.1, tweenOptions);
 	}
 	
 	override public function revive():Void
@@ -42,6 +49,7 @@ class Bomb extends FlxSprite
 		
 		if (frame < TICKS)
 		{
+			tween.duration = 0.1 / frame;
 			animation.frameIndex = frame;
 		}
 		else
