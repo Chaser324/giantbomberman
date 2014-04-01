@@ -3,6 +3,7 @@ package;
 import entities.Bomb;
 import entities.Explosion;
 import entities.Player;
+import entities.SoftWall;
 import entities.TiledLevel;
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -13,6 +14,7 @@ import flixel.group.FlxTypedGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxMath;
+import flixel.util.FlxPoint;
 
 class PlayState extends FlxState
 {
@@ -20,7 +22,7 @@ class PlayState extends FlxState
 	
 	private var explosions:FlxTypedGroup<Explosion> = new FlxTypedGroup<Explosion>();	
 	private var bombs:FlxTypedGroup<Bomb> = new FlxTypedGroup<Bomb>();
-	
+	private var softwalls:FlxTypedGroup<SoftWall> = new FlxTypedGroup<SoftWall>();
 	private var level:TiledLevel;
 	
 	override public function create():Void
@@ -37,6 +39,7 @@ class PlayState extends FlxState
 		
 		add(level.backgroundTiles);
 		add(level.foregroundTiles);
+		add(softwalls);
 		add(explosions);
 		add(bombs);
 		add(players);
@@ -53,7 +56,11 @@ class PlayState extends FlxState
 		super.update();
 		
 		FlxG.collide(level.foregroundTiles, players, overlapPlayerWall);
+		FlxG.collide(softwalls, players, overlapPlayerWall);
 		FlxG.overlap(players, bombs, overlapPlayerBomb);
+		
+		FlxG.overlap(explosions, softwalls, overlapExplosionWall);
+		FlxG.overlap(explosions, bombs, overlapExplosionBomb);
 	}
 	
 	public function addBomb(bomber:Player):Bomb
@@ -73,9 +80,67 @@ class PlayState extends FlxState
 		return explosions.recycle(Explosion);
 	}
 	
+	public function addSoftWall():SoftWall
+	{
+		return softwalls.recycle(SoftWall);
+	}
+	
 	public function wallCollideTest(obj:FlxObject):Bool
 	{
-		return FlxG.overlap(level.foregroundTiles, obj);
+		var retVal:Bool = false;
+		
+		for (layer in level.foregroundTiles)
+		{
+			var layerCast:FlxObject = cast(layer, FlxObject);
+			retVal = layerCast.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8));
+			
+			if (retVal)
+			{
+				break;
+			}
+		}
+		
+		return retVal;
+	}
+	
+	public function softWallCollideTest(obj:FlxObject):Bool
+	{
+		var retVal:Bool = false;
+		
+		for (w in softwalls)
+		{
+			if (!w.alive)
+			{
+				continue;
+			}
+			
+			retVal = w.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8));
+			
+			if (retVal)
+			{
+				break;
+			}
+		}
+		
+		return retVal;
+	}
+	
+	private function overlapExplosionBomb(e:Explosion, b:Bomb)
+	{
+		if (e.x == b.x && e.y == b.y)
+		{
+			e.kill();
+			b.explode();
+		}
+	}
+	
+	private function overlapExplosionWall(e:Explosion, w:SoftWall)
+	{
+		if (e.x == w.x && e.y == w.y)
+		{
+			e.alive = false;
+			w.explode();
+		}
 	}
 	
 	private function overlapPlayerWall(w:FlxObject, p:Player)

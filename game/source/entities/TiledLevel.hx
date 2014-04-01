@@ -121,6 +121,15 @@ class TiledLevel extends TiledMap
 					
 					++playerCount;
 				}
+			case "soft_wall":
+				var wall:SoftWall = state.addSoftWall();
+				wall.x = x;
+				wall.y = y;
+				
+				var tileSheetName:String = g.properties.get("tileset");
+				var processedPath 	= TILESHEET_PATH + tileSheetName + ".png";
+				
+				wall.setImage(processedPath, 0);
 		}
 	}
 	

@@ -69,19 +69,117 @@ class Bomb extends FlxSprite
 			if (Reg.PS.wallCollideTest(explosion))
 			{
 				explosion.kill();
-				
-				if (explosionStack.length > 0)
-				{
-					explosion = explosionStack.pop();
-					explosion.setFrame(FlxObject.UP, true);
-				}
-				
+				break;
+			}
+			else if (Reg.PS.softWallCollideTest(explosion))
+			{
+				explosionStack.push(explosion);
 				break;
 			}
 			else
 			{
 				explosionStack.push(explosion);
 			}
+		}
+		
+		if (explosionStack.length > 0)
+		{
+			explosion = explosionStack.pop();
+			explosion.setFrame(FlxObject.UP, true);
+		}
+		
+		// DOWN
+		explosionStack = new Array<Explosion>();
+		for (i in 1...power)
+		{
+			explosion = Reg.PS.addExplosion();
+			explosion.x = x;
+			explosion.y = y + (i * 16);
+			explosion.setFrame(FlxObject.DOWN, false);
+			
+			if (Reg.PS.wallCollideTest(explosion))
+			{
+				explosion.kill();
+				break;
+			}
+			else if (Reg.PS.softWallCollideTest(explosion))
+			{
+				explosionStack.push(explosion);
+				break;
+			}
+			else
+			{
+				explosionStack.push(explosion);
+			}
+		}
+		
+		if (explosionStack.length > 0)
+		{
+			explosion = explosionStack.pop();
+			explosion.setFrame(FlxObject.DOWN, true);
+		}
+		
+		// LEFT
+		explosionStack = new Array<Explosion>();
+		for (i in 1...power)
+		{
+			explosion = Reg.PS.addExplosion();
+			explosion.x = x - (i * 16);
+			explosion.y = y;
+			explosion.setFrame(FlxObject.LEFT, false);
+			
+			if (Reg.PS.wallCollideTest(explosion))
+			{
+				explosion.kill();
+				break;
+			}
+			else if (Reg.PS.softWallCollideTest(explosion))
+			{
+				explosionStack.push(explosion);
+				break;
+			}
+			else
+			{
+				explosionStack.push(explosion);
+			}
+		}
+		
+		if (explosionStack.length > 0)
+		{
+			explosion = explosionStack.pop();
+			explosion.setFrame(FlxObject.LEFT, true);
+		}
+		
+		
+		// RIGHT
+		explosionStack = new Array<Explosion>();
+		for (i in 1...power)
+		{
+			explosion = Reg.PS.addExplosion();
+			explosion.x = x + (i * 16);
+			explosion.y = y;
+			explosion.setFrame(FlxObject.RIGHT, false);
+			
+			if (Reg.PS.wallCollideTest(explosion))
+			{
+				explosion.kill();				
+				break;
+			}
+			else if (Reg.PS.softWallCollideTest(explosion))
+			{
+				explosionStack.push(explosion);
+				break;
+			}
+			else
+			{
+				explosionStack.push(explosion);
+			}
+		}
+		
+		if (explosionStack.length > 0)
+		{
+			explosion = explosionStack.pop();
+			explosion.setFrame(FlxObject.RIGHT, true);
 		}
 		
 		kill();
