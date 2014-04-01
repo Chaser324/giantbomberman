@@ -17,9 +17,10 @@ class TiledLevel extends TiledMap
 	
 	public var backgroundTiles:FlxGroup;
 	public var foregroundTiles:FlxGroup;
-	public var player:Player;
 	
 	private var collidableTileLayers:Array<FlxTilemap>;
+	
+	private var playerCount:Int = 0;
 
 	public function new(tiledLevel:Dynamic) 
 	{
@@ -67,6 +68,7 @@ class TiledLevel extends TiledMap
 				if (collidableTileLayers == null)
 					collidableTileLayers = new Array<FlxTilemap>();
 				
+				trace(tileLayer.name);
 				foregroundTiles.add(tilemap);
 				collidableTileLayers.push(tilemap);
 			}
@@ -86,14 +88,18 @@ class TiledLevel extends TiledMap
 	
 	public function collideWithLevel(obj:FlxObject, ?notifyCallback:FlxObject->FlxObject->Void, ?processCallback:FlxObject->FlxObject->Bool):Bool
 	{
+		var retVal:Bool = false;
+		
 		if (collidableTileLayers != null)
 		{
 			for (map in collidableTileLayers)
 			{
-				return FlxG.overlap(map, obj, notifyCallback, processCallback != null ? processCallback : FlxObject.separate);
+				//retVal = FlxG.overlap(map, obj, notifyCallback, processCallback != null ? processCallback : FlxObject.separate) || retVal;
+				FlxG.collide(map, obj);
 			}
 		}
-		return false;
+		
+		return retVal;
 	}
 	
 	private function loadObject(o:TiledObject, g:TiledObjectGroup, state:PlayState)
@@ -106,11 +112,18 @@ class TiledLevel extends TiledMap
 			y -= g.map.getGidOwner(o.gid).tileHeight;
 		}
 		
-		//switch (o.type.toLowerCase())
-		//{
-			//case "player_start":
-				//var player = new Player(x, y);
-		//}
+		switch (o.type.toLowerCase())
+		{
+			case "player_start":
+				if (state.players.length > playerCount)
+				{
+					state.players[playerCount].x = x;
+					state.players[playerCount].y = y;
+					state.add(state.players[playerCount]);
+					
+					++playerCount;
+				}
+		}
 	}
 	
 	

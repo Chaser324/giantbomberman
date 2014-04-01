@@ -7,9 +7,6 @@ import flash.events.Event;
 import flash.Lib;
 import flixel.FlxGame;
 
-/**
- * @author Joshua Granick
- */
 class Main extends Sprite 
 {
 	// Entry point
