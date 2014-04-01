@@ -60,6 +60,9 @@ class Bomb extends FlxSprite
 	
 	public function explode():Void
 	{
+		FlxG.cameras.flash(0xffffffff,0.2);
+		FlxG.cameras.shake(0.005, 0.2);
+		
 		var explosion:Explosion = Reg.PS.addExplosion();
 		explosion.x = x;
 		explosion.y = y;

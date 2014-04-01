@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 
 class Explosion extends FlxSprite
 {
-	private static inline var LIFETIME:Float = 1.0;
+	private static inline var LIFETIME:Float = 0.8;
 	
 	private var elapsed:Float = 0;
 
