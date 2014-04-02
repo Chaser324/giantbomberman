@@ -9,8 +9,13 @@ class Player extends FlxSprite
 	public var placedBomb:Bomb;
 	
 	private static inline var TILE_SIZE:Int = 16;
+	private static inline var MAX_SPEED:Float = 2;
 	
-	private var speed:Int = 1;
+	private var speedLevel:Float = 1;
+	private var bombLevel:Int = 1;
+	private var powerLevel:Int = 1;
+	
+	private var bombCount:Int = 0;
 	
 	public function new(X:Int, Y:Int) 
 	{
@@ -56,9 +61,31 @@ class Player extends FlxSprite
 			}
 		}
 		
-		if (FlxG.keys.justPressed.Z && placedBomb == null)
+		if (FlxG.keys.justPressed.Z && placedBomb == null && bombCount < bombLevel)
 		{
-			Reg.PS.addBomb(this);
+			placedBomb = Reg.PS.addBomb(this);
+			placedBomb.setPower(powerLevel);
+			placedBomb.setBomber(this);
+			
+			++bombCount;
+		}
+	}
+	
+	public function bombExploded():Void
+	{
+		--bombCount;
+	}
+	
+	public function collect(collectible:Int):Void
+	{
+		switch (collectible)
+		{
+			case Collectible.TYPE_BOMB:
+				++bombLevel;
+			case Collectible.TYPE_POWER:
+				++powerLevel;
+			case Collectible.TYPE_SPEED:
+				speedLevel = Math.min(MAX_SPEED, speedLevel + 0.2);
 		}
 	}
 	
@@ -66,25 +93,25 @@ class Player extends FlxSprite
 	{
 		if (FlxG.keys.pressed.LEFT)
 		{
-			x -= speed;
+			x -= speedLevel;
 			animation.play("walk-left");
 			facing = FlxObject.LEFT;
 		}
 		else if (FlxG.keys.pressed.RIGHT)
 		{
-			x += speed;
+			x += speedLevel;
 			animation.play("walk-right");
 			facing = FlxObject.RIGHT;
 		}
 		else if (FlxG.keys.pressed.UP)
 		{
-			y -= speed;
+			y -= speedLevel;
 			animation.play("walk-up");
 			facing = FlxObject.UP;
 		}
 		else if (FlxG.keys.pressed.DOWN)
 		{
-			y += speed;
+			y += speedLevel;
 			animation.play("walk-down");
 			facing = FlxObject.DOWN;
 		}

@@ -1,6 +1,8 @@
 package;
 
 import entities.Bomb;
+import entities.Collectible;
+import entities.CollectibleShadow;
 import entities.Explosion;
 import entities.Player;
 import entities.SoftWall;
@@ -15,14 +17,19 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxMath;
 import flixel.util.FlxPoint;
+import flixel.util.FlxRandom;
+import flixel.util.FlxSort;
 
 class PlayState extends FlxState
 {
 	public var players:FlxTypedGroup<Player> = new FlxTypedGroup<Player>();
 	
+	public var sortGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
+	
 	private var explosions:FlxTypedGroup<Explosion> = new FlxTypedGroup<Explosion>();	
 	private var bombs:FlxTypedGroup<Bomb> = new FlxTypedGroup<Bomb>();
 	private var softwalls:FlxTypedGroup<SoftWall> = new FlxTypedGroup<SoftWall>();
+	private var collectibles:FlxTypedGroup<Collectible> = new FlxTypedGroup<Collectible>();
 	private var level:TiledLevel;
 	
 	override public function create():Void
@@ -42,8 +49,13 @@ class PlayState extends FlxState
 		add(softwalls);
 		add(explosions);
 		add(bombs);
-		add(players);
+		add(sortGroup); // display group for players, collectibles
 		level.loadObjects(this);
+		
+		for (p in players)
+		{
+			sortGroup.add(p);
+		}
 	}
 	
 	override public function destroy():Void
@@ -59,9 +71,14 @@ class PlayState extends FlxState
 		FlxG.collide(softwalls, players, overlapPlayerWall);
 		FlxG.overlap(players, bombs, overlapPlayerBomb);
 		
+		FlxG.overlap(players, collectibles, overlapPlayerCollectible);
+		
 		FlxG.overlap(explosions, softwalls, overlapExplosionWall);
 		FlxG.overlap(explosions, bombs, overlapExplosionBomb);
 		FlxG.overlap(explosions, players, overlapExplosionPlayer);
+		FlxG.overlap(explosions, collectibles, overlapExplosionCollectible);
+		
+		sortGroup.sort(FlxSort.byY, FlxSort.ASCENDING);
 	}
 	
 	public function addBomb(bomber:Player):Bomb
@@ -71,9 +88,12 @@ class PlayState extends FlxState
 		bomb.x = 16 * Math.round(bomber.x / 16);
 		bomb.y = 16 * Math.round(bomber.y / 16);
 		
-		bomber.placedBomb = bomb;
-		
 		return bomb;
+	}
+	
+	public function addCollectible():Collectible
+	{
+		return collectibles.recycle(Collectible);
 	}
 	
 	public function addExplosion():Explosion
@@ -126,6 +146,12 @@ class PlayState extends FlxState
 		return retVal;
 	}
 	
+	private function overlapPlayerCollectible(p:Player, shadow:CollectibleShadow)
+	{
+		p.collect(shadow.collectible.getType());
+		shadow.collectible.explode();
+	}
+	
 	private function overlapExplosionPlayer(e:Explosion, p:Player)
 	{
 		var testPoints:Array<FlxPoint> = [
@@ -149,6 +175,14 @@ class PlayState extends FlxState
 		}
 	}
 	
+	private function overlapExplosionCollectible(e:Explosion, shadow:CollectibleShadow)
+	{
+		if (e.alive && e.x == shadow.x && e.y == shadow.y)
+		{
+			shadow.collectible.explode();
+		}
+	}
+	
 	private function overlapExplosionBomb(e:Explosion, b:Bomb)
 	{
 		if (e.x == b.x && e.y == b.y)
@@ -169,6 +203,9 @@ class PlayState extends FlxState
 	
 	private function overlapPlayerWall(w:FlxObject, p:Player)
 	{
+		p.x = Math.round(p.x);
+		p.y = Math.round(p.y);
+		
 		var dx:Float = p.x % 16;
 		var dy:Float = p.y % 16;
 		

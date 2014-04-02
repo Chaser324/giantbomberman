@@ -1,8 +1,10 @@
 package entities;
 import flixel.FlxSprite;
+import flixel.util.FlxRandom;
 
 class SoftWall extends FlxSprite
 {
+	public var collectible:Int = Collectible.TYPE_NONE;
 
 	public function new() 
 	{
@@ -12,6 +14,11 @@ class SoftWall extends FlxSprite
 		width = 16;
 		
 		immovable = true;
+		
+		if (FlxRandom.chanceRoll(25))
+		{
+			collectible = FlxRandom.intRanged(0, Collectible.TYPE_MAX - 1);
+		}
 	}
 	
 	public function setImage(imagePath:String, index:Int)
@@ -22,6 +29,13 @@ class SoftWall extends FlxSprite
 	
 	public function explode():Void
 	{
+		if (collectible != Collectible.TYPE_NONE)
+		{
+			var c:Collectible = Reg.PS.addCollectible();
+			c.setPosition(x, y);
+			c.setType(collectible);
+		}
+		
 		kill();
 	}
 	
