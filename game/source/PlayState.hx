@@ -11,13 +11,8 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.group.FlxGroup;
 import flixel.group.FlxTypedGroup.FlxTypedGroup;
-import flixel.text.FlxText;
-import flixel.ui.FlxButton;
-import flixel.util.FlxMath;
 import flixel.util.FlxPoint;
-import flixel.util.FlxRandom;
 import flixel.util.FlxSort;
 
 class PlayState extends FlxState
@@ -56,6 +51,8 @@ class PlayState extends FlxState
 		{
 			sortGroup.add(p);
 		}
+		
+		FlxG.sound.play("assets/music/game-main-intro.wav", 1, false, true, startMusicLoop);
 	}
 	
 	override public function destroy():Void
@@ -67,8 +64,12 @@ class PlayState extends FlxState
 	{
 		super.update();
 		
-		FlxG.collide(level.foregroundTiles, players, overlapPlayerWall);
-		FlxG.collide(softwalls, players, overlapPlayerWall);
+		FlxG.collide(players, level.foregroundTiles, overlapPlayerWall);
+		FlxG.collide(players, softwalls, overlapPlayerWall);
+		
+		FlxG.collide(bombs, level.foregroundTiles, overlapBombWall);
+		FlxG.collide(bombs, softwalls, overlapBombWall);
+		
 		FlxG.overlap(players, bombs, overlapPlayerBomb);
 		
 		FlxG.overlap(players, collectibles, overlapPlayerCollectible);
@@ -146,6 +147,11 @@ class PlayState extends FlxState
 		return retVal;
 	}
 	
+	private function startMusicLoop():Void
+	{
+		FlxG.sound.playMusic("assets/music/game-main-loop.wav");
+	}
+	
 	private function overlapPlayerCollectible(p:Player, shadow:CollectibleShadow)
 	{
 		p.collect(shadow.collectible.getType());
@@ -201,7 +207,14 @@ class PlayState extends FlxState
 		}
 	}
 	
-	private function overlapPlayerWall(w:FlxObject, p:Player)
+	private function overlapBombWall(b:Bomb, w:FlxObject)
+	{
+		b.x = 16 * Math.round(b.x / 16);
+		b.y = 16 * Math.round(b.y / 16);
+		b.stopSlide();
+	}
+	
+	private function overlapPlayerWall(p:Player, w:FlxObject)
 	{
 		p.x = Math.round(p.x);
 		p.y = Math.round(p.y);
@@ -230,11 +243,11 @@ class PlayState extends FlxState
 	
 	private function overlapPlayerBomb(p:Player, b:Bomb):Void
 	{
+		var dx:Float = p.x - b.x;
+		var dy:Float = p.y - b.y;
+			
 		if (p.placedBomb != b)
 		{
-			var dx:Float = p.x - b.x;
-			var dy:Float = p.y - b.y;
-			
 			if (dy == 0 && Math.abs(dx) < 16)
 			{
 				p.x = 16 * Math.round(p.x / 16);
@@ -242,6 +255,26 @@ class PlayState extends FlxState
 			else if (dx == 0 && Math.abs(dy) < 16)
 			{
 				p.y = 16 * Math.round(p.y / 16);
+			}
+			
+			if (p.getKick())
+			{
+				if (dx > 0 && p.facing == FlxObject.LEFT)
+				{
+					b.slide(FlxObject.LEFT);
+				}
+				else if (dx < 0 && p.facing == FlxObject.RIGHT)
+				{
+					b.slide(FlxObject.RIGHT);
+				}
+				else if (dy > 0 && p.facing == FlxObject.UP)
+				{
+					b.slide(FlxObject.UP);
+				}
+				else if (dy < 0 && p.facing == FlxObject.DOWN)
+				{
+					b.slide(FlxObject.DOWN);
+				}
 			}
 		}
 	}

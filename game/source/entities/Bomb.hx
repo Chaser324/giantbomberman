@@ -2,12 +2,13 @@ package entities;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
 
 class Bomb extends FlxSprite
 {
 	private static inline var TICKS:Int = 4;
-	private static inline var TICK_TIME:Float = 0.5;
+	private static inline var TICK_TIME:Float = 0.75;
 	
 	private var power:Int = 2;
 	private var bomber:Player = null;
@@ -15,6 +16,11 @@ class Bomb extends FlxSprite
 	private var elapsed:Float = 0;
 	
 	private var tween:FlxTween;
+	
+	private var soundExplode:FlxSound;
+	
+	private var vx:Float = 0;
+	private var vy:Float = 0;
 	
 	public function new() 
 	{
@@ -31,6 +37,8 @@ class Bomb extends FlxSprite
 		
 		var tweenOptions:TweenOptions = {type: FlxTween.PINGPONG}
 		tween = FlxTween.multiVar(offset, { x: 1 }, 0.1, tweenOptions);
+		
+		soundExplode = FlxG.sound.load("assets/sounds/bomb-explode.wav");
 	}
 	
 	override public function revive():Void
@@ -38,11 +46,16 @@ class Bomb extends FlxSprite
 		super.revive();
 		
 		elapsed = 0;
+		vx = 0;
+		vy = 0;
 	}
 	
 	override public function update():Void
 	{
 		super.update();
+		
+		x += vx;
+		y += vy;
 		
 		elapsed += FlxG.elapsed;
 		
@@ -74,6 +87,9 @@ class Bomb extends FlxSprite
 		FlxG.cameras.flash(0xffffffff,0.2);
 		FlxG.cameras.shake(0.005, 0.2);
 		
+		x = 16 * Math.round(x / 16);
+		y = 16 * Math.round(y / 16);
+		
 		explodeDir(0, 0, FlxObject.NONE);
 		explodeDir(0, -1, FlxObject.UP);
 		explodeDir(0, 1, FlxObject.DOWN);
@@ -82,7 +98,36 @@ class Bomb extends FlxSprite
 		
 		bomber.bombExploded();
 		
+		soundExplode.play();
+		
 		kill();
+	}
+	
+	public function slide(dir:Int):Void
+	{
+		immovable = false;
+		switch (dir)
+		{
+			case FlxObject.RIGHT:
+				vx = 2;
+				vy = 0;
+			case FlxObject.LEFT:
+				vx = -2;
+				vy = 0;
+			case FlxObject.UP:
+				vx = 0;
+				vy = -2;
+			case FlxObject.DOWN:
+				vx = 0;
+				vy = 2;
+		}
+	}
+	
+	public function stopSlide():Void
+	{
+		vx = 0;
+		vy = 0;
+		immovable = true;
 	}
 	
 	private function explodeDir(dx:Float, dy:Float, dir:Int):Void

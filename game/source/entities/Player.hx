@@ -2,6 +2,7 @@ package entities;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.system.FlxSound;
 import flixel.util.FlxPoint;
 
 class Player extends FlxSprite
@@ -14,8 +15,12 @@ class Player extends FlxSprite
 	private var speedLevel:Float = 1;
 	private var bombLevel:Int = 1;
 	private var powerLevel:Int = 1;
+	private var kick:Bool = true;
 	
 	private var bombCount:Int = 0;
+	
+	private var soundItemCollect:FlxSound;
+	private var soundBombDrop:FlxSound;
 	
 	public function new(X:Int, Y:Int) 
 	{
@@ -37,6 +42,9 @@ class Player extends FlxSprite
 		animation.add("walk-left", [3, 4, 3, 5], 10, true);
 		animation.add("walk-down", [6, 7, 6, 8], 10, true);
 		animation.add("walk-right", [11, 9, 11, 10], 10, true);
+		
+		soundItemCollect = FlxG.sound.load("assets/sounds/item-collect.wav");
+		soundBombDrop = FlxG.sound.load("assets/sounds/bomb-drop.wav");
 	}
 	
 	override public function update():Void
@@ -68,7 +76,14 @@ class Player extends FlxSprite
 			placedBomb.setBomber(this);
 			
 			++bombCount;
+			
+			soundBombDrop.play();
 		}
+	}
+	
+	public function getKick():Bool
+	{
+		return kick;
 	}
 	
 	public function bombExploded():Void
@@ -87,6 +102,8 @@ class Player extends FlxSprite
 			case Collectible.TYPE_SPEED:
 				speedLevel = Math.min(MAX_SPEED, speedLevel + 0.2);
 		}
+		
+		soundItemCollect.play();
 	}
 	
 	private function move():Void
