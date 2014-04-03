@@ -69,6 +69,7 @@ class PlayState extends FlxState
 		
 		FlxG.collide(bombs, level.foregroundTiles, overlapBombWall);
 		FlxG.collide(bombs, softwalls, overlapBombWall);
+		FlxG.collide(bombs, bombs, overlapBombBomb);
 		
 		FlxG.overlap(players, bombs, overlapPlayerBomb);
 		
@@ -205,6 +206,17 @@ class PlayState extends FlxState
 			e.alive = false;
 			w.explode();
 		}
+	}
+	
+	private function overlapBombBomb(b1:Bomb, b2:Bomb)
+	{
+		b1.x = 16 * Math.round(b1.x / 16);
+		b1.y = 16 * Math.round(b1.y / 16);
+		b1.stopSlide();
+		
+		b2.x = 16 * Math.round(b2.x / 16);
+		b2.y = 16 * Math.round(b2.y / 16);
+		b2.stopSlide();
 	}
 	
 	private function overlapBombWall(b:Bomb, w:FlxObject)
