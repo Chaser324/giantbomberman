@@ -108,6 +108,16 @@ class PlayState extends FlxState
 		return softwalls.recycle(SoftWall);
 	}
 	
+	public function getWidth():Int
+	{
+		return level.fullWidth;
+	}
+	
+	public function getHeight():Int
+	{
+		return level.fullHeight;
+	}
+	
 	public function wallCollideTest(obj:FlxObject):Bool
 	{
 		var retVal:Bool = false;
@@ -143,6 +153,40 @@ class PlayState extends FlxState
 			{
 				break;
 			}
+		}
+		
+		return retVal;
+	}
+	
+	public function bombCollideTest(obj:FlxObject):Bool
+	{
+		var retVal:Bool = false;
+		
+		for (w in bombs)
+		{
+			if (!w.alive || w == obj)
+			{
+				continue;
+			}
+			
+			retVal = w.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8));
+			
+			if (retVal)
+			{
+				break;
+			}
+		}
+		
+		return retVal;
+	}
+	
+	public function inBoundsTest(obj:FlxObject):Bool
+	{
+		var retVal:Bool = false;
+		
+		if (obj.x > 0 && obj.y > 0 && obj.x < level.fullWidth && obj.y < level.fullHeight)
+		{
+			retVal = true;
 		}
 		
 		return retVal;

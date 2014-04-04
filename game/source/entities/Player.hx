@@ -16,6 +16,7 @@ class Player extends FlxSprite
 	private var bombLevel:Int = 1;
 	private var powerLevel:Int = 1;
 	private var kick:Bool = true;
+	private var toss:Bool = true;
 	
 	private var bombCount:Int = 0;
 	
@@ -53,7 +54,7 @@ class Player extends FlxSprite
 		
 		move();
 		
-		if (placedBomb != null)
+		if (placedBomb != null && placedBomb.getHeld() == false)
 		{
 			if (FlxG.overlap(this, placedBomb) == false)
 			{
@@ -78,6 +79,15 @@ class Player extends FlxSprite
 			++bombCount;
 			
 			soundBombDrop.play();
+		}
+		else if (FlxG.keys.justPressed.Z && toss && placedBomb != null)
+		{
+			placedBomb.pickUp();
+		}
+		else if (FlxG.keys.justReleased.Z && placedBomb != null && placedBomb.getHeld())
+		{
+			placedBomb.toss();
+			placedBomb = null;
 		}
 	}
 	
