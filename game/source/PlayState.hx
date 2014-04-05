@@ -180,6 +180,27 @@ class PlayState extends FlxState
 		return retVal;
 	}
 	
+	public function getBomb(obj:FlxObject):Bomb
+	{
+		var retVal:Bomb = null;
+		
+		for (w in bombs)
+		{
+			if (!w.alive || w == obj)
+			{
+				continue;
+			}
+			
+			if (w.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8)))
+			{
+				retVal = w;
+				break;
+			}
+		}
+		
+		return retVal;
+	}
+	
 	public function inBoundsTest(obj:FlxObject):Bool
 	{
 		var retVal:Bool = false;
@@ -220,7 +241,7 @@ class PlayState extends FlxState
 		{
 			if (e.pixelsOverlapPoint(point))
 			{
-				p.kill();
+				p.explode();
 				break;
 			}
 		}

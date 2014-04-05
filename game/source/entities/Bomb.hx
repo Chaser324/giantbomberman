@@ -143,6 +143,9 @@ class Bomb extends FlxSprite
 				{
 					tossed = false;
 					solid = true;
+					
+					animation.frameIndex = 0;
+					
 					offset.x = -1;
 					tween.active = true;
 				}
@@ -155,17 +158,33 @@ class Bomb extends FlxSprite
 		held = true;
 		solid = false;
 		
-		animation.frameIndex = 0;
+		animation.frameIndex = 4;
+		
+		elapsed = 0;
 		
 		offset.x = 0;
 		tween.active = false;
 	}
 	
-	public function toss():Void
+	public function toss(range:Int, dir:Int = -1):Void
 	{
 		held = false;
 		tossed = true;
-		tossDirection = bomber.facing;
+		
+		vx = 0;
+		vy = 0;
+		
+		animation.frameIndex = 4;
+		
+		if (dir > 0)
+		{
+			tossDirection = dir;
+		}
+		else
+		{
+			tossDirection = bomber.facing;
+		}
+		
 		
 		tossTarget = new FlxPoint();
 		tossTarget.x = 16 * Math.round(bomber.x / 16);
@@ -174,13 +193,13 @@ class Bomb extends FlxSprite
 		switch(tossDirection)
 		{
 			case FlxObject.LEFT:
-				tossTarget.x -= 2 * 16;
+				tossTarget.x -= range * 16;
 			case FlxObject.RIGHT:
-				tossTarget.x += 2 * 16;
+				tossTarget.x += range * 16;
 			case FlxObject.UP:
-				tossTarget.y -= 2 * 16;
+				tossTarget.y -= range * 16;
 			case FlxObject.DOWN:
-				tossTarget.y += 2 * 16;
+				tossTarget.y += range * 16;
 		}
 		
 		var tweenOptions:TweenOptions = {type: FlxTween.ONESHOT}
@@ -225,21 +244,24 @@ class Bomb extends FlxSprite
 	
 	public function slide(dir:Int):Void
 	{
-		immovable = false;
-		switch (dir)
+		if (!held && !tossed && solid)
 		{
-			case FlxObject.RIGHT:
-				vx = 2;
-				vy = 0;
-			case FlxObject.LEFT:
-				vx = -2;
-				vy = 0;
-			case FlxObject.UP:
-				vx = 0;
-				vy = -2;
-			case FlxObject.DOWN:
-				vx = 0;
-				vy = 2;
+			immovable = false;
+			switch (dir)
+			{
+				case FlxObject.RIGHT:
+					vx = 2;
+					vy = 0;
+				case FlxObject.LEFT:
+					vx = -2;
+					vy = 0;
+				case FlxObject.UP:
+					vx = 0;
+					vy = -2;
+				case FlxObject.DOWN:
+					vx = 0;
+					vy = 2;
+			}
 		}
 	}
 	
