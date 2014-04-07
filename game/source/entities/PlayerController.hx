@@ -39,11 +39,11 @@ class PlayerController extends FlxObject
 			gamepadLastX = gamepadX;
 			gamepadLastY = gamepadY;
 #if flash
-			gamepadX = gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_X);
-			gamepadY = gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_Y);
+			gamepadX = gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X);
+			gamepadY = gamepad.getYAxis(XboxButtonID.LEFT_ANALOGUE_Y);
 #else
-			gamepadX = gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_X) + gamepad.hat.x;
-			gamepadY = gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_Y) + gamepad.hat.y;
+			gamepadX = gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X) + gamepad.hat.x;
+			gamepadY = gamepad.getYAxis(XboxButtonID.LEFT_ANALOGUE_Y) + gamepad.hat.y;
 #end
 		}
 	}
@@ -80,22 +80,22 @@ class PlayerController extends FlxObject
 					return gamepad.pressed(XboxButtonID.B);
 #if flash
 				case LEFT_BUTTON:
-					return gamepad.pressed(XboxButtonID.DPAD_LEFT) || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_X) < 0;
+					return gamepad.pressed(XboxButtonID.DPAD_LEFT) || gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X) < 0;
 				case RIGHT_BUTTON:
-					return gamepad.pressed(XboxButtonID.DPAD_RIGHT) || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_X) > 0;
+					return gamepad.pressed(XboxButtonID.DPAD_RIGHT) || gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X) > 0;
 				case UP_BUTTON:
-					return gamepad.pressed(XboxButtonID.DPAD_UP) || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_Y) > 0;
+					return gamepad.pressed(XboxButtonID.DPAD_UP) || gamepad.getYAxis(XboxButtonID.LEFT_ANALOGUE_Y) < 0;
 				case DOWN_BUTTON:
-					return gamepad.pressed(XboxButtonID.DPAD_DOWN) || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_Y) < 0;
+					return gamepad.pressed(XboxButtonID.DPAD_DOWN) || gamepad.getYAxis(XboxButtonID.LEFT_ANALOGUE_Y) > 0;
 #else
 				case LEFT_BUTTON:
-					return gamepad.hat.x < 0 || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_X) < 0;
+					return gamepad.hat.x < 0 || gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X) < 0;
 				case RIGHT_BUTTON:
-					return gamepad.hat.x > 0 || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_X) > 0;
+					return gamepad.hat.x > 0 || gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X) > 0;
 				case UP_BUTTON:
-					return gamepad.hat.y < 0 || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_Y) < 0;
+					return gamepad.hat.y < 0 || gamepad.getYAxis(XboxButtonID.LEFT_ANALOGUE_Y) < 0;
 				case DOWN_BUTTON:
-					return gamepad.hat.y > 0 || gamepad.getAxis(XboxButtonID.LEFT_ANALOGUE_Y) > 0;
+					return gamepad.hat.y > 0 || gamepad.getYAxis(XboxButtonID.LEFT_ANALOGUE_Y) > 0;
 #end
 				default:
 					return false;
@@ -139,9 +139,9 @@ class PlayerController extends FlxObject
 				case RIGHT_BUTTON:
 					return gamepad.justPressed(XboxButtonID.DPAD_RIGHT) || (gamepadLastX == 0 && gamepadX > 0);
 				case UP_BUTTON:
-					return gamepad.justPressed(XboxButtonID.DPAD_UP) || (gamepadLastY == 0 && gamepadY > 0);
+					return gamepad.justPressed(XboxButtonID.DPAD_UP) || (gamepadLastY == 0 && gamepadY < 0);
 				case DOWN_BUTTON:
-					return gamepad.justPressed(XboxButtonID.DPAD_DOWN) || (gamepadLastY == 0 && gamepadY < 0);
+					return gamepad.justPressed(XboxButtonID.DPAD_DOWN) || (gamepadLastY == 0 && gamepadY > 0);
 #else
 				case LEFT_BUTTON:
 					return (gamepadLastX == 0 && gamepadX < 0);
@@ -194,9 +194,9 @@ class PlayerController extends FlxObject
 				case RIGHT_BUTTON:
 					return gamepad.justReleased(XboxButtonID.DPAD_RIGHT) || (gamepadX == 0 && gamepadLastX > 0);
 				case UP_BUTTON:
-					return gamepad.justReleased(XboxButtonID.DPAD_UP) || (gamepadY == 0 && gamepadLastY > 0);
+					return gamepad.justReleased(XboxButtonID.DPAD_UP) || (gamepadY == 0 && gamepadLastY < 0);
 				case DOWN_BUTTON:
-					return gamepad.justReleased(XboxButtonID.DPAD_DOWN) || (gamepadY == 0 && gamepadLastY < 0);
+					return gamepad.justReleased(XboxButtonID.DPAD_DOWN) || (gamepadY == 0 && gamepadLastY > 0);
 #else
 				case LEFT_BUTTON:
 					return (gamepadX == 0 && gamepadLastX < 0);
