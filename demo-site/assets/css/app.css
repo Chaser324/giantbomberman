@@ -1,6 +1,8 @@
 body {
 	color: #fafafa;
-	background: #111111;
+	background: #282581 url(../img/title-pattern.png) no-repeat center center;
+	background-attachment: fixed;
+	background-size: cover;
 	font-family: "Open Sans",Arial,sans-serif;
 	padding-bottom: 40px;
 }
@@ -32,4 +34,10 @@ object {
 	-webkit-box-shadow: 5px 5px 35px rgba(0,0,0,0.7);
 	-mox-box-shadow: 5px 5px 35px rgba(0,0,0,0.7);
 	box-shadow: 5px 5px 35px rgba(0,0,0,0.7);
+}
+
+#content {
+	background: #282581;
+	padding-top: 15px;
+	padding-bottom: 15px;
 }

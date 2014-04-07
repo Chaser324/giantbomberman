@@ -91,7 +91,7 @@ class Collectible extends FlxGroup
 		icon.offset.y = 3;
 		
 		var tweenOptions:TweenOptions = {type: FlxTween.PINGPONG, ease: FlxEase.quadInOut}
-		iconTween = FlxTween.multiVar(icon.offset, { y: 7 }, 0.5, tweenOptions);
+		iconTween = FlxTween.tween(icon.offset, { y: 7 }, 0.5, tweenOptions);
 	}
 	
 }

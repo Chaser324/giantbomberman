@@ -18,7 +18,7 @@ class Player extends FlxSprite
 	private var powerLevel:Int = 1;
 	private var kick:Bool = false;
 	private var toss:Bool = false;
-	private var punch:Bool = true;
+	private var punch:Bool = false;
 	
 	private var bombCount:Int = 0;
 	
@@ -37,7 +37,7 @@ class Player extends FlxSprite
 		
 		height = 16;
 		width = 16;
-		offset = new FlxPoint(0, 16);
+		offset = FlxPoint.get(0, 16);
 		
 		facing = FlxObject.DOWN;
 		
@@ -178,7 +178,7 @@ class Player extends FlxSprite
 		powerLevel = 1;
 		speedLevel = 2;
 		
-		var targetPoint:FlxPoint = new FlxPoint();
+		var targetPoint:FlxPoint = FlxPoint.get();
 		
 		switch (facing)
 		{

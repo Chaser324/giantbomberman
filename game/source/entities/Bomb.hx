@@ -42,8 +42,8 @@ class Bomb extends FlxSprite
 		
 		offset.x = -1;
 		
-		var tweenOptions:TweenOptions = {type: FlxTween.PINGPONG}
-		tween = FlxTween.multiVar(offset, { x: 1 }, 0.1, tweenOptions);
+		var tweenOptions:TweenOptions = { type: FlxTween.PINGPONG };
+		tween = FlxTween.tween(offset, { x: 1 }, 0.1, tweenOptions);
 		
 		soundExplode = FlxG.sound.load("assets/sounds/bomb-explode.wav");
 	}
@@ -186,7 +186,7 @@ class Bomb extends FlxSprite
 		}
 		
 		
-		tossTarget = new FlxPoint();
+		tossTarget = FlxPoint.get();
 		tossTarget.x = 16 * Math.round(bomber.x / 16);
 		tossTarget.y = 16 * Math.round(bomber.y / 16);
 		

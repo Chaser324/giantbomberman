@@ -125,7 +125,7 @@ class PlayState extends FlxState
 		for (layer in level.foregroundTiles)
 		{
 			var layerCast:FlxObject = cast(layer, FlxObject);
-			retVal = layerCast.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8));
+			retVal = layerCast.overlapsPoint(FlxPoint.get(obj.x + 8, obj.y + 8));
 			
 			if (retVal)
 			{
@@ -147,7 +147,7 @@ class PlayState extends FlxState
 				continue;
 			}
 			
-			retVal = w.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8));
+			retVal = w.overlapsPoint(FlxPoint.get(obj.x + 8, obj.y + 8));
 			
 			if (retVal)
 			{
@@ -169,7 +169,7 @@ class PlayState extends FlxState
 				continue;
 			}
 			
-			retVal = w.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8));
+			retVal = w.overlapsPoint(FlxPoint.get(obj.x + 8, obj.y + 8));
 			
 			if (retVal)
 			{
@@ -191,7 +191,7 @@ class PlayState extends FlxState
 				continue;
 			}
 			
-			if (w.overlapsPoint(new FlxPoint(obj.x + 8, obj.y + 8)))
+			if (w.overlapsPoint(FlxPoint.get(obj.x + 8, obj.y + 8)))
 			{
 				retVal = w;
 				break;
@@ -227,14 +227,14 @@ class PlayState extends FlxState
 	private function overlapExplosionPlayer(e:Explosion, p:Player)
 	{
 		var testPoints:Array<FlxPoint> = [
-			new FlxPoint(p.x, p.y),
-			new FlxPoint(p.x + 8, p.y),
-			new FlxPoint(p.x + 16, p.y),
-			new FlxPoint(p.x + 16, p.y + 8),
-			new FlxPoint(p.x + 16, p.y + 16),
-			new FlxPoint(p.x + 8, p.y + 16),
-			new FlxPoint(p.x, p.y + 16),
-			new FlxPoint(p.x, p.y + 8),
+			FlxPoint.get(p.x, p.y),
+			FlxPoint.get(p.x + 8, p.y),
+			FlxPoint.get(p.x + 16, p.y),
+			FlxPoint.get(p.x + 16, p.y + 8),
+			FlxPoint.get(p.x + 16, p.y + 16),
+			FlxPoint.get(p.x + 8, p.y + 16),
+			FlxPoint.get(p.x, p.y + 16),
+			FlxPoint.get(p.x, p.y + 8),
 		];
 		
 		for (point in testPoints)
