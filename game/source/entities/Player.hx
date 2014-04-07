@@ -29,9 +29,13 @@ class Player extends FlxSprite
 	private var deadVx:Float = 0;
 	private var deadVy:Float = 0;
 	
-	public function new(X:Int, Y:Int) 
+	private var controller:PlayerController;
+	
+	public function new(c:PlayerController) 
 	{
-		super(X, Y);
+		super();
+		
+		controller = c;
 		
 		loadGraphic("assets/images/players/brad.png", true, false, 16, 32);
 		
@@ -64,6 +68,8 @@ class Player extends FlxSprite
 	{
 		super.update();
 		
+		controller.update();
+		
 		if (!dead)
 		{
 			move();
@@ -84,7 +90,7 @@ class Player extends FlxSprite
 				}
 			}
 		
-			if (FlxG.keys.justPressed.Z && placedBomb == null && bombCount < bombLevel)
+			if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
 			{
 				placedBomb = Reg.PS.addBomb(this);
 				placedBomb.setPower(powerLevel);
@@ -94,17 +100,17 @@ class Player extends FlxSprite
 				
 				soundBombDrop.play();
 			}
-			else if (FlxG.keys.justPressed.Z && toss && placedBomb != null)
+			else if (controller.justPressed(PlayerController.BOMB_BUTTON) && toss && placedBomb != null)
 			{
 				placedBomb.pickUp();
 			}
-			else if (FlxG.keys.justReleased.Z && placedBomb != null && placedBomb.getHeld())
+			else if (controller.justReleased(PlayerController.BOMB_BUTTON) && placedBomb != null && placedBomb.getHeld())
 			{
 				placedBomb.toss(2);
 				placedBomb = null;
 			}
 			
-			if (FlxG.keys.justPressed.X && punch && (placedBomb == null || !placedBomb.getHeld()))
+			if (controller.justPressed(PlayerController.ACTION_BUTTON) && punch && (placedBomb == null || !placedBomb.getHeld()))
 			{
 				var testObj:FlxObject = new FlxObject(x, y);
 				
@@ -138,7 +144,7 @@ class Player extends FlxSprite
 		{
 			moveDead();
 			
-			if (FlxG.keys.justPressed.Z && placedBomb == null && bombCount < bombLevel)
+			if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
 			{
 				placedBomb = Reg.PS.addBomb(this);
 				placedBomb.setPower(powerLevel);
@@ -221,13 +227,16 @@ class Player extends FlxSprite
 	
 	private function moveDead():Void
 	{
-		if (!FlxG.keys.pressed.LEFT && !FlxG.keys.pressed.RIGHT && !FlxG.keys.pressed.UP && !FlxG.keys.pressed.DOWN)
+		if (!controller.pressed(PlayerController.LEFT_BUTTON) && 
+		    !controller.pressed(PlayerController.RIGHT_BUTTON) &&
+			!controller.pressed(PlayerController.UP_BUTTON) &&
+			!controller.pressed(PlayerController.DOWN_BUTTON))
 		{
 			deadVx = 0;
 			deadVy = 0;
 		}
 		
-		if (FlxG.keys.justPressed.LEFT)
+		if (controller.justPressed(PlayerController.LEFT_BUTTON))
 		{
 			if (facing == FlxObject.UP || facing == FlxObject.DOWN)
 			{
@@ -235,7 +244,7 @@ class Player extends FlxSprite
 				deadVy = 0;
 			}
 		}
-		else if (FlxG.keys.justPressed.RIGHT)
+		else if (controller.justPressed(PlayerController.RIGHT_BUTTON))
 		{
 			if (facing == FlxObject.UP || facing == FlxObject.DOWN)
 			{
@@ -243,7 +252,7 @@ class Player extends FlxSprite
 				deadVy = 0;
 			}
 		}
-		else if (FlxG.keys.justPressed.UP)
+		else if (controller.justPressed(PlayerController.UP_BUTTON))
 		{
 			if (facing == FlxObject.LEFT || facing == FlxObject.RIGHT)
 			{
@@ -251,7 +260,7 @@ class Player extends FlxSprite
 				deadVy = -1 * speedLevel;
 			}
 		}
-		else if (FlxG.keys.justPressed.DOWN)
+		else if (controller.justPressed(PlayerController.DOWN_BUTTON))
 		{
 			if (facing == FlxObject.LEFT || facing == FlxObject.RIGHT)
 			{
@@ -364,25 +373,25 @@ class Player extends FlxSprite
 	
 	private function move():Void
 	{
-		if (FlxG.keys.pressed.LEFT)
+		if (controller.pressed(PlayerController.LEFT_BUTTON))
 		{
 			x -= speedLevel;
 			animation.play("walk-left");
 			facing = FlxObject.LEFT;
 		}
-		else if (FlxG.keys.pressed.RIGHT)
+		else if (controller.pressed(PlayerController.RIGHT_BUTTON))
 		{
 			x += speedLevel;
 			animation.play("walk-right");
 			facing = FlxObject.RIGHT;
 		}
-		else if (FlxG.keys.pressed.UP)
+		else if (controller.pressed(PlayerController.UP_BUTTON))
 		{
 			y -= speedLevel;
 			animation.play("walk-up");
 			facing = FlxObject.UP;
 		}
-		else if (FlxG.keys.pressed.DOWN)
+		else if (controller.pressed(PlayerController.DOWN_BUTTON))
 		{
 			y += speedLevel;
 			animation.play("walk-down");

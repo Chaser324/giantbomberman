@@ -1,5 +1,6 @@
 package;
 
+import entities.PlayerController;
 import flash.display.BlendMode;
 import flixel.addons.effects.FlxTrail;
 import flixel.effects.particles.FlxEmitter;
@@ -142,6 +143,14 @@ class MainMenuState extends FlxState
 	
 	private function nextScene(timer:FlxTimer):Void
 	{
+		Reg.Controllers = new Array<PlayerController>();
+		Reg.Controllers.push(new PlayerController(null));
+		
+		for (c in FlxG.gamepads.getActiveGamepads())
+		{
+			Reg.Controllers.push(new PlayerController(c));
+		}
+		
 		FlxG.switchState(new PlayState());
 	}
 }

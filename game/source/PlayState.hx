@@ -5,6 +5,7 @@ import entities.Collectible;
 import entities.CollectibleShadow;
 import entities.Explosion;
 import entities.Player;
+import entities.PlayerController;
 import entities.SoftWall;
 import entities.TiledLevel;
 import flixel.FlxG;
@@ -35,7 +36,10 @@ class PlayState extends FlxState
 		
 		FlxG.mouse.visible = false;
 		
-		players.add(new Player(0,0));
+		for (c in Reg.Controllers)
+		{
+			players.add(new Player(c));
+		}
 		
 		level = new TiledLevel("assets/levels/box-city.tmx");
 		
