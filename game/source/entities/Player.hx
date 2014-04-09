@@ -1,4 +1,5 @@
 package entities;
+import flixel.animation.FlxAnimationController;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -9,6 +10,10 @@ import flixel.util.FlxPoint;
 class Player extends FlxSprite
 {
 	public var placedBomb:Bomb;
+	public var playerName:String = "";
+	public var wins:Int = 0;
+	public var playerNumber:Int;
+	public var controller:PlayerController;
 	
 	private static inline var TILE_SIZE:Int = 16;
 	private static inline var MAX_SPEED:Float = 2;
@@ -20,6 +25,8 @@ class Player extends FlxSprite
 	private var toss:Bool = false;
 	private var punch:Bool = false;
 	
+	private var fixed:Bool = true;
+	
 	private var bombCount:Int = 0;
 	
 	private var soundItemCollect:FlxSound;
@@ -29,36 +36,13 @@ class Player extends FlxSprite
 	private var deadVx:Float = 0;
 	private var deadVy:Float = 0;
 	
-	private var controller:PlayerController;
+	private var graphicPath:String;	
 	
-	public function new(c:PlayerController) 
+	public function new(c:PlayerController = null) 
 	{
 		super();
 		
 		controller = c;
-		
-		loadGraphic("assets/images/players/brad.png", true, false, 16, 32);
-		
-		height = 16;
-		width = 16;
-		offset = FlxPoint.get(0, 16);
-		
-		facing = FlxObject.DOWN;
-		
-		animation.add("idle-up", [0], 10, false);
-		animation.add("idle-left", [3], 10, false);
-		animation.add("idle-down", [6], 10, false);
-		animation.add("idle-right", [11], 10, false);
-		
-		animation.add("dead-up", [14], 10, false);
-		animation.add("dead-left", [13], 10, false);
-		animation.add("dead-down", [12], 10, false);
-		animation.add("dead-right", [15], 10, false);
-		
-		animation.add("walk-up", [0, 1, 0, 2], 10, true);
-		animation.add("walk-left", [3, 4, 3, 5], 10, true);
-		animation.add("walk-down", [6, 7, 6, 8], 10, true);
-		animation.add("walk-right", [11, 9, 11, 10], 10, true);
 		
 		soundItemCollect = FlxG.sound.load("assets/sounds/item-collect.wav");
 		soundBombDrop = FlxG.sound.load("assets/sounds/bomb-drop.wav");
@@ -68,96 +52,123 @@ class Player extends FlxSprite
 	{
 		super.update();
 		
-		controller.update();
-		
-		if (!dead)
+		if (controller != null && !fixed)
 		{
-			move();
+			controller.update();
 		
-			if (placedBomb != null && placedBomb.getHeld() == false)
+			if (!dead)
 			{
-				if (FlxG.overlap(this, placedBomb) == false)
-				{
-					placedBomb = null;
-				}
-				else if (placedBomb.x == x && placedBomb.y - y == 16)
-				{
-					placedBomb = null;
-				}
-				else if (placedBomb.y == y && placedBomb.x - x == 16)
-				{
-					placedBomb = null;
-				}
-			}
-		
-			if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
-			{
-				placedBomb = Reg.PS.addBomb(this);
-				placedBomb.setPower(powerLevel);
-				placedBomb.setBomber(this);
-				
-				++bombCount;
-				
-				soundBombDrop.play();
-			}
-			else if (controller.justPressed(PlayerController.BOMB_BUTTON) && toss && placedBomb != null)
-			{
-				placedBomb.pickUp();
-			}
-			else if (controller.justReleased(PlayerController.BOMB_BUTTON) && placedBomb != null && placedBomb.getHeld())
-			{
-				placedBomb.toss(2);
-				placedBomb = null;
-			}
+				move();
 			
-			if (controller.justPressed(PlayerController.ACTION_BUTTON) && punch && (placedBomb == null || !placedBomb.getHeld()))
-			{
-				var testObj:FlxObject = new FlxObject(x, y);
-				
-				switch (facing)
+				if (placedBomb != null && placedBomb.getHeld() == false)
 				{
-					case FlxObject.DOWN:
-						testObj.y += 16;
-					case FlxObject.UP:
-						testObj.y -= 16;
-					case FlxObject.LEFT:
-						testObj.x -= 16;
-					case FlxObject.RIGHT:
-						testObj.x += 16;
+					if (FlxG.overlap(this, placedBomb) == false)
+					{
+						placedBomb = null;
+					}
+					else if (placedBomb.x == x && placedBomb.y - y == 16)
+					{
+						placedBomb = null;
+					}
+					else if (placedBomb.y == y && placedBomb.x - x == 16)
+					{
+						placedBomb = null;
+					}
+				}
+			
+				if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
+				{
+					placedBomb = Reg.PS.addBomb(this);
+					placedBomb.setPower(powerLevel);
+					placedBomb.setBomber(this);
+					
+					++bombCount;
+					
+					soundBombDrop.play();
+				}
+				else if (controller.justPressed(PlayerController.BOMB_BUTTON) && toss && placedBomb != null)
+				{
+					placedBomb.pickUp();
+				}
+				else if (controller.justReleased(PlayerController.BOMB_BUTTON) && placedBomb != null && placedBomb.getHeld())
+				{
+					placedBomb.toss(2);
+					placedBomb = null;
 				}
 				
-				var target:Bomb = Reg.PS.getBomb(testObj);
-				
-				if (target != null)
+				if (controller.justPressed(PlayerController.ACTION_BUTTON) && punch && (placedBomb == null || !placedBomb.getHeld()))
 				{
-					if ((facing == FlxObject.DOWN && target.y - y < 18) ||
-					    (facing == FlxObject.UP && y - target.y < 18) ||
-						(facing == FlxObject.LEFT && x - target.x < 18) ||
-						(facing == FlxObject.RIGHT && target.x - x < 18))
+					var testObj:FlxObject = new FlxObject(x, y);
+					
+					switch (facing)
 					{
-						target.toss(2, facing);
+						case FlxObject.DOWN:
+							testObj.y += 16;
+						case FlxObject.UP:
+							testObj.y -= 16;
+						case FlxObject.LEFT:
+							testObj.x -= 16;
+						case FlxObject.RIGHT:
+							testObj.x += 16;
+					}
+					
+					var target:Bomb = Reg.PS.getBomb(testObj);
+					
+					if (target != null)
+					{
+						if ((facing == FlxObject.DOWN && target.y - y < 18) ||
+							(facing == FlxObject.UP && y - target.y < 18) ||
+							(facing == FlxObject.LEFT && x - target.x < 18) ||
+							(facing == FlxObject.RIGHT && target.x - x < 18))
+						{
+							target.toss(2, facing);
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			moveDead();
-			
-			if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
+			else
 			{
-				placedBomb = Reg.PS.addBomb(this);
-				placedBomb.setPower(powerLevel);
-				placedBomb.setBomber(this);
+				moveDead();
 				
-				++bombCount;
-				
-				soundBombDrop.play();
-				
-				placedBomb.toss(4);
-				placedBomb = null;
+				if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
+				{
+					placedBomb = Reg.PS.addBomb(this);
+					placedBomb.setPower(powerLevel);
+					placedBomb.setBomber(this);
+					
+					++bombCount;
+					
+					soundBombDrop.play();
+					
+					placedBomb.toss(4);
+					placedBomb = null;
+				}
 			}
 		}
+	}
+	
+	override public function revive():Void
+	{
+		super.revive();
+		
+		fixed = false;
+		dead = false;
+		
+		initAnimations();
+		animation.play("idle-down");
+		
+		soundItemCollect = FlxG.sound.load("assets/sounds/item-collect.wav");
+		soundBombDrop = FlxG.sound.load("assets/sounds/bomb-drop.wav");
+	}
+	
+	public function hasController():Bool
+	{
+		return (controller != null);
+	}
+	
+	public function setFixed(val:Bool):Void
+	{
+		fixed = val;
 	}
 	
 	public function getKick():Bool
@@ -168,6 +179,17 @@ class Player extends FlxSprite
 	public function getDead():Bool
 	{
 		return dead;
+	}
+	
+	public function getGraphicPath():String
+	{
+		return graphicPath;
+	}
+	
+	public function setGraphicPath(s:String)
+	{
+		graphicPath = s;
+		initAnimations();
 	}
 	
 	public function bombExploded():Void
@@ -223,6 +245,31 @@ class Player extends FlxSprite
 		}
 		
 		soundItemCollect.play();
+	}
+	
+	private function initAnimations():Void
+	{
+		loadGraphic(graphicPath, true, false, 16, 32);
+		height = 16;
+		width = 16;
+		offset = FlxPoint.get(0, 16);
+		
+		facing = FlxObject.DOWN;
+		
+		animation.add("idle-up", [0], 10, false);
+		animation.add("idle-left", [3], 10, false);
+		animation.add("idle-down", [6], 10, false);
+		animation.add("idle-right", [11], 10, false);
+		
+		animation.add("dead-up", [14], 10, false);
+		animation.add("dead-left", [13], 10, false);
+		animation.add("dead-down", [12], 10, false);
+		animation.add("dead-right", [15], 10, false);
+		
+		animation.add("walk-up", [0, 1, 0, 2], 10, true);
+		animation.add("walk-left", [3, 4, 3, 5], 10, true);
+		animation.add("walk-down", [6, 7, 6, 8], 10, true);
+		animation.add("walk-right", [11, 9, 11, 10], 10, true);
 	}
 	
 	private function moveDead():Void

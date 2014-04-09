@@ -1,9 +1,7 @@
 package;
-import entities.PlayerController;
+import entities.Player;
 
 class Reg
 {
 	public static var PS:PlayState;
-	
-	public static var Controllers:Array<PlayerController>;
 }

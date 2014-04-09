@@ -28,7 +28,7 @@ class Collectible extends FlxGroup
 		
 		shadow = new CollectibleShadow(this);
 		shadow.loadGraphic("assets/images/items.png", true, false, 16, 16);
-		shadow.animation.frameIndex = 3;
+		shadow.animation.frameIndex = 7;
 		shadow.height = 16;
 		shadow.width = 16;
 		

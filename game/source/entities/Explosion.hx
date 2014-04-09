@@ -5,7 +5,7 @@ import flixel.FlxSprite;
 
 class Explosion extends FlxSprite
 {
-	private static inline var LIFETIME:Float = 0.8;
+	private static inline var LIFETIME:Float = 0.5;
 	
 	private var elapsed:Float = 0;
 
@@ -18,13 +18,15 @@ class Explosion extends FlxSprite
 		height = 16;
 		width = 16;
 		
-		animation.add("top", [0, 1, 2, 3], 5, false);
-		animation.add("vertical", [4, 5, 6, 7], 5, false);
-		animation.add("left", [8, 9, 10, 11], 5, false);
-		animation.add("bottom", [12, 13, 14, 15], 5, false);
-		animation.add("horizontal", [16, 17, 18, 19], 5, false);
-		animation.add("right", [20, 21, 22, 23], 5, false);
-		animation.add("center", [24, 25, 26, 27], 5, false);
+		var frameRate:Int = Math.floor(4 / LIFETIME);
+		
+		animation.add("top", [0, 1, 2, 3], frameRate, false);
+		animation.add("vertical", [4, 5, 6, 7], frameRate, false);
+		animation.add("left", [8, 9, 10, 11], frameRate, false);
+		animation.add("bottom", [12, 13, 14, 15], frameRate, false);
+		animation.add("horizontal", [16, 17, 18, 19], frameRate, false);
+		animation.add("right", [20, 21, 22, 23], frameRate, false);
+		animation.add("center", [24, 25, 26, 27], frameRate, false);
 		
 		immovable = true;
 	}

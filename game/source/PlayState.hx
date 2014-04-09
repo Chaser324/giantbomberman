@@ -6,6 +6,7 @@ import entities.CollectibleShadow;
 import entities.Explosion;
 import entities.Player;
 import entities.PlayerController;
+import entities.PlayerUI;
 import entities.SoftWall;
 import entities.TiledLevel;
 import flixel.FlxG;
@@ -13,8 +14,12 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxTypedGroup.FlxTypedGroup;
+import flixel.text.FlxText;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
 import flixel.util.FlxPoint;
 import flixel.util.FlxSort;
+import flixel.util.FlxTimer;
 
 class PlayState extends FlxState
 {
@@ -22,11 +27,20 @@ class PlayState extends FlxState
 	
 	public var sortGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
 	
+	private var ui:FlxTypedGroup<PlayerUI> = new FlxTypedGroup<PlayerUI>();
 	private var explosions:FlxTypedGroup<Explosion> = new FlxTypedGroup<Explosion>();	
 	private var bombs:FlxTypedGroup<Bomb> = new FlxTypedGroup<Bomb>();
 	private var softwalls:FlxTypedGroup<SoftWall> = new FlxTypedGroup<SoftWall>();
 	private var collectibles:FlxTypedGroup<Collectible> = new FlxTypedGroup<Collectible>();
 	private var level:TiledLevel;
+	
+	private var message:FlxSprite;
+	
+	private var roundComplete:Bool = false;
+	private var matchComplete:Bool = false;
+	private var resultText:String;
+	
+	private var phase:Int = 0;
 	
 	override public function create():Void
 	{
@@ -36,9 +50,11 @@ class PlayState extends FlxState
 		
 		FlxG.mouse.visible = false;
 		
-		for (c in Reg.Controllers)
+		for (p in players)
 		{
-			players.add(new Player(c));
+			p.revive();
+			ui.add(new PlayerUI(p));
+			p.setFixed(true);
 		}
 		
 		level = new TiledLevel("assets/levels/box-city.tmx");
@@ -48,13 +64,9 @@ class PlayState extends FlxState
 		add(softwalls);
 		add(explosions);
 		add(bombs);
+		add(ui);
 		add(sortGroup); // display group for players, collectibles
 		level.loadObjects(this);
-		
-		for (p in players)
-		{
-			sortGroup.add(p);
-		}
 		
 		FlxG.sound.play("assets/music/game-main-intro.wav", 1, false, true, startMusicLoop);
 	}
@@ -68,23 +80,136 @@ class PlayState extends FlxState
 	{
 		super.update();
 		
-		FlxG.collide(players, level.foregroundTiles, overlapPlayerWall);
-		FlxG.collide(players, softwalls, overlapPlayerWall);
-		
-		FlxG.collide(bombs, level.foregroundTiles, overlapBombWall);
-		FlxG.collide(bombs, softwalls, overlapBombWall);
-		FlxG.collide(bombs, bombs, overlapBombBomb);
-		
-		FlxG.overlap(players, bombs, overlapPlayerBomb);
-		
-		FlxG.overlap(players, collectibles, overlapPlayerCollectible);
-		
-		FlxG.overlap(explosions, softwalls, overlapExplosionWall);
-		FlxG.overlap(explosions, bombs, overlapExplosionBomb);
-		FlxG.overlap(explosions, players, overlapExplosionPlayer);
-		FlxG.overlap(explosions, collectibles, overlapExplosionCollectible);
-		
-		sortGroup.sort(FlxSort.byY, FlxSort.ASCENDING);
+		switch(phase)
+		{
+			case 0:
+				message = new FlxSprite();
+				message.loadGraphic("assets/images/game-ready.png");
+				message.x = (FlxG.width / 2) - (message.frameWidth / 2);
+				message.y = (FlxG.height / 2) - (message.frameHeight / 2) - 50;
+				
+				add(message);
+				
+				var tweenOptions:TweenOptions = { type: FlxTween.ONESHOT, ease: FlxEase.bounceOut, complete: nextPhaseTween };
+				FlxTween.tween(message, { y: message.y + 50 }, 0.7, tweenOptions);
+				
+				++phase;
+			case 2:
+				FlxTimer.start(2, nextPhaseTimer, 1);
+				++phase;
+			case 4:
+				message.loadGraphic("assets/images/game-fight.png");
+				message.x = (FlxG.width / 2) - (message.frameWidth / 2);
+				message.y = (FlxG.height / 2) - (message.frameHeight / 2);
+				message.scale.x = 0.5;
+				message.scale.y = 0.5;
+				
+				var tweenOptions:TweenOptions = { type: FlxTween.ONESHOT, ease: FlxEase.elasticOut, complete: nextPhaseTween };
+				FlxTween.tween(message.scale, { x: 1, y: 1 }, 0.7, tweenOptions);
+				
+				++phase;
+			case 6:
+				FlxTimer.start(0.5, nextPhaseTimer, 1);
+				++phase;
+			case 8:
+				remove(message);
+				++phase;
+				
+				for (p in players)
+				{
+					p.setFixed(false);
+				}
+			case 9:
+				FlxG.collide(players, level.foregroundTiles, overlapPlayerWall);
+				FlxG.collide(players, softwalls, overlapPlayerWall);
+				
+				FlxG.collide(bombs, level.foregroundTiles, overlapBombWall);
+				FlxG.collide(bombs, softwalls, overlapBombWall);
+				FlxG.collide(bombs, bombs, overlapBombBomb);
+				
+				FlxG.overlap(players, bombs, overlapPlayerBomb);
+				
+				FlxG.overlap(players, collectibles, overlapPlayerCollectible);
+				
+				FlxG.overlap(explosions, softwalls, overlapExplosionWall);
+				FlxG.overlap(explosions, bombs, overlapExplosionBomb);
+				FlxG.overlap(explosions, players, overlapExplosionPlayer);
+				FlxG.overlap(explosions, collectibles, overlapExplosionCollectible);
+				
+				var winner:Player = null;
+				var livingCount:Int = 0;
+				for (p in players)
+				{
+					if (!p.getDead())
+					{
+						++livingCount;
+						winner = p;
+					}
+				}
+				
+				if (livingCount == 0)
+				{
+					roundComplete = true;
+					resultText = "DRAW";
+					++phase;
+				}
+				else if (livingCount == 1)
+				{
+					roundComplete = true;
+					winner.wins += 1;
+					
+					resultText = winner.playerName + " WINS ROUND";
+					
+					++phase;
+					
+					if (winner.wins == 3)
+					{
+						resultText = winner.playerName + " WINS MATCH";
+						matchComplete = true;
+					}	
+				}
+				
+				sortGroup.sort(FlxSort.byY, FlxSort.ASCENDING);
+			case 10:
+				var winText:FlxText = new FlxText(0, 100, FlxG.width, resultText, 25);
+				winText.font = "assets/fonts/slicker.ttf";
+				winText.antialiasing = false;
+				winText.borderStyle = FlxText.BORDER_SHADOW;
+				winText.borderColor = 0x000000;
+				winText.borderSize = 5;
+				winText.alignment = "center";
+				add(winText);
+				
+				for (p in players)
+				{
+					p.setFixed(true);
+				}
+				
+				remove(bombs);
+				remove(explosions);
+				
+				FlxTimer.start(3, nextPhaseTimer, 1);
+				++phase;
+			case 12:
+				switchState();
+		}
+	}
+	
+	public function setPlayers(pArray:Array<Player>)
+	{
+		for (p in pArray)
+		{
+			var p2:Player = new Player();
+			
+			p2.setGraphicPath(p.getGraphicPath());
+			p2.controller = p.controller;
+			p2.playerName = p.playerName;
+			p2.wins = p.wins;
+			p2.playerNumber = p.playerNumber;
+			
+			players.add(p2);
+			sortGroup.add(p2);
+		}
 	}
 	
 	public function addBomb(bomber:Player):Bomb
@@ -357,6 +482,30 @@ class PlayState extends FlxState
 					b.slide(FlxObject.DOWN);
 				}
 			}
+		}
+	}
+	
+	private function nextPhaseTween(t:FlxTween):Void
+	{
+		++phase;
+	}
+	
+	private function nextPhaseTimer(t:FlxTimer):Void
+	{
+		++phase;
+	}
+	
+	private function switchState():Void
+	{
+		if (!matchComplete)
+		{
+			var ps:PlayState = new PlayState();
+			ps.setPlayers(players.members);
+			FlxG.switchState(ps);
+		}
+		else
+		{
+			FlxG.resetGame();
 		}
 	}
 }

@@ -12,6 +12,8 @@ class PlayerController extends FlxObject
 	public static inline var RIGHT_BUTTON:Int = 3;
 	public static inline var BOMB_BUTTON:Int = 4;
 	public static inline var ACTION_BUTTON:Int = 5;
+	public static inline var CANCEL_BUTTON:Int = 6;
+	public static inline var CONFIRM_BUTTON:Int = 7;
 	
 	private var gamepad:FlxGamepad = null;
 	private var gamepadLastX:Float = 0;
@@ -48,6 +50,18 @@ class PlayerController extends FlxObject
 		}
 	}
 	
+	public function getID():Int
+	{
+		if (gamepad != null)
+		{
+			return gamepad.id;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	
 	public function pressed(button:Int):Bool
 	{
 		if (gamepad == null)
@@ -63,9 +77,13 @@ class PlayerController extends FlxObject
 				case RIGHT_BUTTON:
 					return FlxG.keys.pressed.RIGHT;
 				case BOMB_BUTTON:
-					return FlxG.keys.pressed.Z;
+					return FlxG.keys.pressed.Z || FlxG.keys.pressed.ENTER || FlxG.keys.pressed.Y;
 				case ACTION_BUTTON:
 					return FlxG.keys.pressed.X;
+				case CANCEL_BUTTON:
+					return FlxG.keys.pressed.ESCAPE;
+				case CONFIRM_BUTTON:
+					return FlxG.keys.pressed.Z || FlxG.keys.pressed.ENTER || FlxG.keys.pressed.Y;
 				default:
 					return false;
 			}
@@ -77,7 +95,11 @@ class PlayerController extends FlxObject
 				case BOMB_BUTTON:
 					return gamepad.pressed(XboxButtonID.A);
 				case ACTION_BUTTON:
+					return gamepad.pressed(XboxButtonID.X);
+				case CANCEL_BUTTON:
 					return gamepad.pressed(XboxButtonID.B);
+				case CONFIRM_BUTTON:
+					return gamepad.pressed(XboxButtonID.A) || gamepad.pressed(XboxButtonID.START);
 #if flash
 				case LEFT_BUTTON:
 					return gamepad.pressed(XboxButtonID.DPAD_LEFT) || gamepad.getXAxis(XboxButtonID.LEFT_ANALOGUE_X) < 0;
@@ -118,9 +140,13 @@ class PlayerController extends FlxObject
 				case RIGHT_BUTTON:
 					return FlxG.keys.justPressed.RIGHT;
 				case BOMB_BUTTON:
-					return FlxG.keys.justPressed.Z;
+					return FlxG.keys.justPressed.Z || FlxG.keys.justPressed.ENTER || FlxG.keys.justPressed.Y;
 				case ACTION_BUTTON:
 					return FlxG.keys.justPressed.X;
+				case CANCEL_BUTTON:
+					return FlxG.keys.justPressed.ESCAPE;
+				case CONFIRM_BUTTON:
+					return FlxG.keys.justPressed.Z || FlxG.keys.justPressed.ENTER || FlxG.keys.justPressed.Y;
 				default:
 					return false;
 			}
@@ -132,7 +158,11 @@ class PlayerController extends FlxObject
 				case BOMB_BUTTON:
 					return gamepad.justPressed(XboxButtonID.A);
 				case ACTION_BUTTON:
+					return gamepad.justPressed(XboxButtonID.X);
+				case CANCEL_BUTTON:
 					return gamepad.justPressed(XboxButtonID.B);
+				case CONFIRM_BUTTON:
+					return gamepad.justPressed(XboxButtonID.A) || gamepad.justPressed(XboxButtonID.START);
 #if flash
 				case LEFT_BUTTON:
 					return gamepad.justPressed(XboxButtonID.DPAD_LEFT) || (gamepadLastX == 0 && gamepadX < 0);
@@ -173,9 +203,13 @@ class PlayerController extends FlxObject
 				case RIGHT_BUTTON:
 					return FlxG.keys.justReleased.RIGHT;
 				case BOMB_BUTTON:
-					return FlxG.keys.justReleased.Z;
+					return FlxG.keys.justReleased.Z || FlxG.keys.justReleased.ENTER || FlxG.keys.justReleased.Y;
 				case ACTION_BUTTON:
 					return FlxG.keys.justReleased.X;
+				case CANCEL_BUTTON:
+					return FlxG.keys.justReleased.ESCAPE;
+				case CONFIRM_BUTTON:
+					return FlxG.keys.justReleased.Z || FlxG.keys.justReleased.ENTER || FlxG.keys.justReleased.Y;
 				default:
 					return false;
 			}
@@ -187,7 +221,11 @@ class PlayerController extends FlxObject
 				case BOMB_BUTTON:
 					return gamepad.justReleased(XboxButtonID.A);
 				case ACTION_BUTTON:
+					return gamepad.justReleased(XboxButtonID.X);
+				case CANCEL_BUTTON:
 					return gamepad.justReleased(XboxButtonID.B);
+				case CONFIRM_BUTTON:
+					return gamepad.justReleased(XboxButtonID.A) || gamepad.justReleased(XboxButtonID.START);
 #if flash
 				case LEFT_BUTTON:
 					return gamepad.justReleased(XboxButtonID.DPAD_LEFT) || (gamepadX == 0 && gamepadLastX < 0);

@@ -1,17 +1,28 @@
 package;
 
+import entities.Player;
+import entities.PlayerAlex;
+import entities.PlayerBrad;
 import entities.PlayerController;
-import flash.display.BlendMode;
+import entities.PlayerDrew;
+import entities.PlayerJeff;
+import entities.PlayerPatrick;
+import entities.PlayerRorie;
+import entities.PlayerRyan;
+import entities.PlayerSelect;
+import entities.PlayerVinny;
 import flixel.addons.effects.FlxTrail;
 import flixel.effects.particles.FlxEmitter;
 import flixel.effects.particles.FlxParticle;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.input.gamepad.FlxGamepadManager;
+import flixel.group.FlxTypedGroup.FlxTypedGroup;
+import flixel.input.gamepad.XboxButtonID;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
 
 class MainMenuState extends FlxState
@@ -22,6 +33,10 @@ class MainMenuState extends FlxState
 	private var pressStart:FlxSprite;
 	private var overlay:FlxSprite;
 	
+	private var players:FlxTypedGroup<Player>;
+	private var playerSelectors:FlxTypedGroup<PlayerSelect> = new FlxTypedGroup<PlayerSelect>();
+	private var sortGroup:FlxTypedGroup<FlxSprite> = new FlxTypedGroup<FlxSprite>();
+	
 	private var stingerSound:FlxSound;
 	
 	private var bombTween:FlxTween;
@@ -31,7 +46,7 @@ class MainMenuState extends FlxState
 	
 	private var sparkEmitter:FlxEmitter;
 	
-	private var started:Bool = false;
+	private var phase:Int = 0;
 	
 	override public function create():Void
 	{
@@ -82,7 +97,6 @@ class MainMenuState extends FlxState
 		{
 			var spark:FlxParticle = new FlxParticle();
 			spark.makeGraphic(4, 4, 0xffd9df29);
-			//spark.visible = false;
 			sparkEmitter.add(spark);
 		}
 		
@@ -92,6 +106,7 @@ class MainMenuState extends FlxState
 		add(pressStart);
 		add(logoTrail);
 		add(logo);
+		add(sortGroup);
 		add(overlay);
 		
 		sparkEmitter.start(false, 1, .05);
@@ -108,14 +123,176 @@ class MainMenuState extends FlxState
 	{
 		super.update();
 		
-		if ((FlxG.keys.justPressed.ANY || FlxG.gamepads.anyButton()) && !started)
+		switch (phase)
 		{
-			started = true;
-			somethingPressed();
+			case 0:
+				if ((FlxG.keys.justPressed.ANY || FlxG.gamepads.anyButton()))
+				{
+					++phase;
+					
+					pressStart.loadGraphic("assets/images/title-confirm.png");
+					pressStart.x = (FlxG.width / 2) - (pressStart.frameWidth / 2);
+					pressStart.y = FlxG.height - pressStart.frameHeight;
+					
+					sparkEmitter.setPosition(pressStart.x, pressStart.y);
+					sparkEmitter.setSize(pressStart.frameWidth, pressStart.frameHeight);
+					
+					if (players == null)
+					{
+						players = new FlxTypedGroup<Player>();
+						players.add(new PlayerAlex());
+						players.add(new PlayerBrad());
+						players.add(new PlayerDrew());
+						players.add(new PlayerJeff());
+						players.add(new PlayerPatrick());
+						players.add(new PlayerRorie());
+						players.add(new PlayerRyan());
+						players.add(new PlayerVinny());
+						
+						for (i in 0...players.length)
+						{
+							players.members[i].x = i * 32 + 45;
+							players.members[i].y = (i % 2) * 20 + 150;
+							
+							sortGroup.add(players.members[i]);
+						}
+					}
+					
+					for (p in players)
+					{
+						p.revive();
+						p.setFixed(true);
+					}
+				}
+			case 1:
+				checkForNewPlayers();
+				
+				FlxG.overlap(playerSelectors, players, selectorPlayerOverlap);				
+				sortGroup.sort(FlxSort.byY, FlxSort.ASCENDING);
+				
+				var allConfirmed:Bool = false;
+				for (s in playerSelectors)
+				{
+					if (s.alive && s.selectionConfirmed)
+					{
+						allConfirmed = true;
+					}
+					else
+					{
+						allConfirmed = false;
+						break;
+					}
+				}
+				
+				if (allConfirmed)
+				{
+					++phase;
+				}
+			case 2:
+				checkForNewPlayers();
+				
+				var allConfirmed:Bool = false;
+				var startConfirmed:Bool = false;
+				for (s in playerSelectors)
+				{
+					if (s.alive && s.controller.justPressed(PlayerController.CONFIRM_BUTTON))
+					{
+						startConfirmed = true;
+					}
+					
+					if (s.alive && s.selectionConfirmed)
+					{
+						allConfirmed = true;
+					}
+					else
+					{
+						allConfirmed = false;
+						break;
+					}
+				}
+				
+				if (!allConfirmed)
+				{
+					--phase;
+				}
+				else if (allConfirmed && startConfirmed)
+				{
+					++phase;
+				}
+			case 3:
+				startGame();
+				++phase;
 		}
 	}
 	
-	private function somethingPressed():Void
+	private function selectorPlayerOverlap(s:PlayerSelect, p:Player)
+	{
+		s.selectedPlayer = p;
+		
+		if (s.last.x == s.x && s.last.y == s.y)
+		{
+			s.x = p.x;
+			s.y = p.y + 1;
+		}
+	}
+	
+	private function checkForNewPlayers():Void
+	{
+		if (FlxG.keys.justPressed.ANY && !FlxG.keys.justPressed.ESCAPE)
+		{
+			var alreadyAdded:Bool = false;
+			for (s in playerSelectors)
+			{
+				if (s.alive && s.controller.getID() == -1)
+				{
+					alreadyAdded = true;
+					break;
+				}
+			}
+			
+			if (!alreadyAdded)
+			{
+				var p:PlayerSelect = playerSelectors.recycle(PlayerSelect);
+				
+				p.controller = new PlayerController();
+				p.animation.frameIndex = playerSelectors.members.indexOf(p);
+				p.x = p.animation.frameIndex * 32 + 45;
+				p.y = 110;
+				
+				sortGroup.add(p);
+			}
+		}
+		
+		for (g in FlxG.gamepads.getActiveGamepads())
+		{
+			if (g.anyJustPressed([XboxButtonID.A, XboxButtonID.START]) && !g.justPressed(XboxButtonID.B))
+			{
+				var alreadyAdded:Bool = false;
+				for (s in playerSelectors)
+				{
+					if (s.alive && s.controller.getID() == g.id)
+					{
+						alreadyAdded = true;
+						break;
+					}
+				}
+				
+				if (!alreadyAdded)
+				{
+					var p:PlayerSelect = playerSelectors.recycle(PlayerSelect);
+					
+					p.controller = new PlayerController(g);
+					p.animation.frameIndex = playerSelectors.members.indexOf(p);
+					p.x = p.animation.frameIndex * 32 + 45;
+					p.y = 110;
+					
+					sortGroup.add(p);
+				}
+			}
+		}
+	}
+	
+	private function startGame():Void
 	{
 		var tweenOptions:TweenOptions = { type: FlxTween.ONESHOT, ease: FlxEase.backIn, startDelay: 1.5 };
 		
@@ -125,6 +302,18 @@ class MainMenuState extends FlxState
 		bomb.scale.x = 1;
 		bomb.scale.y = 1;
 		bomb.angle = 0;
+		
+		for (p in players)
+		{
+			FlxTween.tween(p.scale, { x: 0, y: 0 }, 1, tweenOptions);
+			FlxTween.tween(p, { x: FlxG.width / 2, y: FlxG.height / 2 }, 1, tweenOptions);
+		}
+		
+		for (p in playerSelectors)
+		{
+			FlxTween.tween(p.scale, { x: 0, y: 0 }, 1, tweenOptions);
+			FlxTween.tween(p, { x: FlxG.width / 2, y: FlxG.height / 2 }, 1, tweenOptions);
+		}
 		
 		FlxTween.tween(bomb.scale, { x: 0, y: 0 }, 1, tweenOptions);
 		FlxTween.tween(bomb, { angle: 359 }, 1, tweenOptions);
@@ -143,14 +332,19 @@ class MainMenuState extends FlxState
 	
 	private function nextScene(timer:FlxTimer):Void
 	{
-		Reg.Controllers = new Array<PlayerController>();
-		Reg.Controllers.push(new PlayerController(null));
+		var selectedPlayers:Array<Player> = new Array<Player>();
 		
-		for (c in FlxG.gamepads.getActiveGamepads())
+		for (p in players)
 		{
-			Reg.Controllers.push(new PlayerController(c));
+			if (p.hasController())
+			{
+				p.playerNumber = selectedPlayers.length;
+				selectedPlayers.push(p);
+			}
 		}
 		
-		FlxG.switchState(new PlayState());
+		var ps:PlayState = new PlayState();
+		ps.setPlayers(selectedPlayers);
+		FlxG.switchState(ps);
 	}
 }
