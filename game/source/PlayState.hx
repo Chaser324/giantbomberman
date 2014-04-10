@@ -497,6 +497,7 @@ class PlayState extends FlxState
 	
 	private function switchState():Void
 	{
+		
 		if (!matchComplete)
 		{
 			var ps:PlayState = new PlayState();
