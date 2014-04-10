@@ -14,52 +14,52 @@ class Player extends FlxSprite
 	public var wins:Int = 0;
 	public var playerNumber:Int;
 	public var controller:PlayerController;
-	
+
 	private static inline var TILE_SIZE:Int = 16;
 	private static inline var MAX_SPEED:Float = 2;
-	
-	private var speedLevel:Float = 1;
+
+	private var speedLevel:Float = 1.4;
 	private var bombLevel:Int = 1;
 	private var powerLevel:Int = 1;
 	private var kick:Bool = false;
 	private var toss:Bool = false;
 	private var punch:Bool = false;
-	
+
 	private var fixed:Bool = true;
-	
+
 	private var bombCount:Int = 0;
-	
+
 	private var soundItemCollect:FlxSound;
 	private var soundBombDrop:FlxSound;
-	
+
 	private var dead:Bool = false;
 	private var deadVx:Float = 0;
 	private var deadVy:Float = 0;
-	
-	private var graphicPath:String;	
-	
-	public function new(c:PlayerController = null) 
+
+	private var graphicPath:String;
+
+	public function new(c:PlayerController = null)
 	{
 		super();
-		
+
 		controller = c;
-		
+
 		soundItemCollect = FlxG.sound.load("assets/sounds/item-collect.wav");
 		soundBombDrop = FlxG.sound.load("assets/sounds/bomb-drop.wav");
 	}
-	
+
 	override public function update():Void
 	{
 		super.update();
-		
+
 		if (controller != null && !fixed)
 		{
 			controller.update();
-		
+
 			if (!dead)
 			{
 				move();
-			
+
 				if (placedBomb != null && placedBomb.getHeld() == false)
 				{
 					if (FlxG.overlap(this, placedBomb) == false)
@@ -75,15 +75,15 @@ class Player extends FlxSprite
 						placedBomb = null;
 					}
 				}
-			
+
 				if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
 				{
 					placedBomb = Reg.PS.addBomb(this);
 					placedBomb.setPower(powerLevel);
 					placedBomb.setBomber(this);
-					
+
 					++bombCount;
-					
+
 					soundBombDrop.play();
 				}
 				else if (controller.justPressed(PlayerController.BOMB_BUTTON) && toss && placedBomb != null)
@@ -95,11 +95,11 @@ class Player extends FlxSprite
 					placedBomb.toss(2);
 					placedBomb = null;
 				}
-				
+
 				if (controller.justPressed(PlayerController.ACTION_BUTTON) && punch && (placedBomb == null || !placedBomb.getHeld()))
 				{
 					var testObj:FlxObject = new FlxObject(x, y);
-					
+
 					switch (facing)
 					{
 						case FlxObject.DOWN:
@@ -111,9 +111,9 @@ class Player extends FlxSprite
 						case FlxObject.RIGHT:
 							testObj.x += 16;
 					}
-					
+
 					var target:Bomb = Reg.PS.getBomb(testObj);
-					
+
 					if (target != null)
 					{
 						if ((facing == FlxObject.DOWN && target.y - y < 18) ||
@@ -129,85 +129,85 @@ class Player extends FlxSprite
 			else
 			{
 				moveDead();
-				
+
 				if (controller.justPressed(PlayerController.BOMB_BUTTON) && placedBomb == null && bombCount < bombLevel)
 				{
 					placedBomb = Reg.PS.addBomb(this);
 					placedBomb.setPower(powerLevel);
 					placedBomb.setBomber(this);
-					
+
 					++bombCount;
-					
+
 					soundBombDrop.play();
-					
+
 					placedBomb.toss(4);
 					placedBomb = null;
 				}
 			}
 		}
 	}
-	
+
 	override public function revive():Void
 	{
 		super.revive();
-		
+
 		fixed = false;
 		dead = false;
-		
+
 		initAnimations();
 		animation.play("idle-down");
-		
+
 		soundItemCollect = FlxG.sound.load("assets/sounds/item-collect.wav");
 		soundBombDrop = FlxG.sound.load("assets/sounds/bomb-drop.wav");
 	}
-	
+
 	public function hasController():Bool
 	{
 		return (controller != null);
 	}
-	
+
 	public function setFixed(val:Bool):Void
 	{
 		fixed = val;
 	}
-	
+
 	public function getKick():Bool
 	{
 		return kick;
 	}
-	
+
 	public function getDead():Bool
 	{
 		return dead;
 	}
-	
+
 	public function getGraphicPath():String
 	{
 		return graphicPath;
 	}
-	
+
 	public function setGraphicPath(s:String)
 	{
 		graphicPath = s;
 		initAnimations();
 	}
-	
+
 	public function bombExploded():Void
 	{
 		--bombCount;
 	}
-	
+
 	public function explode():Void
 	{
 		dead = true;
 		solid = false;
-		
+
 		bombLevel = 1;
 		powerLevel = 1;
 		speedLevel = 2;
-		
+
 		var targetPoint:FlxPoint = FlxPoint.get();
-		
+
 		switch (facing)
 		{
 			case FlxObject.LEFT:
@@ -227,11 +227,11 @@ class Player extends FlxSprite
 				targetPoint.x = x;
 				targetPoint.y = Reg.PS.getHeight() - 16;
 		}
-		
+
 		var tweenOptions:TweenOptions = {type: FlxTween.ONESHOT}
 		var tween:FlxTween = FlxTween.linearMotion(this, x, y, targetPoint.x, targetPoint.y, 0.5, true, tweenOptions);
 	}
-	
+
 	public function collect(collectible:Int):Void
 	{
 		switch (collectible)
@@ -242,39 +242,47 @@ class Player extends FlxSprite
 				++powerLevel;
 			case Collectible.TYPE_SPEED:
 				speedLevel = Math.min(MAX_SPEED, speedLevel + 0.2);
+			case Collectible.TYPE_THROW:
+				toss = true;
+			case Collectible.TYPE_KICK:
+				kick = true;
+			case Collectible.TYPE_PUNCH:
+				punch = true;
+			case Collectible.TYPE_MAXPOWER:
+				powerLevel = 20;
 		}
-		
+
 		soundItemCollect.play();
 	}
-	
+
 	private function initAnimations():Void
 	{
 		loadGraphic(graphicPath, true, false, 16, 32);
 		height = 16;
 		width = 16;
 		offset = FlxPoint.get(0, 16);
-		
+
 		facing = FlxObject.DOWN;
-		
+
 		animation.add("idle-up", [0], 10, false);
 		animation.add("idle-left", [3], 10, false);
 		animation.add("idle-down", [6], 10, false);
 		animation.add("idle-right", [11], 10, false);
-		
+
 		animation.add("dead-up", [14], 10, false);
 		animation.add("dead-left", [13], 10, false);
 		animation.add("dead-down", [12], 10, false);
 		animation.add("dead-right", [15], 10, false);
-		
+
 		animation.add("walk-up", [0, 1, 0, 2], 10, true);
 		animation.add("walk-left", [3, 4, 3, 5], 10, true);
 		animation.add("walk-down", [6, 7, 6, 8], 10, true);
 		animation.add("walk-right", [11, 9, 11, 10], 10, true);
 	}
-	
+
 	private function moveDead():Void
 	{
-		if (!controller.pressed(PlayerController.LEFT_BUTTON) && 
+		if (!controller.pressed(PlayerController.LEFT_BUTTON) &&
 		    !controller.pressed(PlayerController.RIGHT_BUTTON) &&
 			!controller.pressed(PlayerController.UP_BUTTON) &&
 			!controller.pressed(PlayerController.DOWN_BUTTON))
@@ -282,7 +290,7 @@ class Player extends FlxSprite
 			deadVx = 0;
 			deadVy = 0;
 		}
-		
+
 		if (controller.justPressed(PlayerController.LEFT_BUTTON))
 		{
 			if (facing == FlxObject.UP || facing == FlxObject.DOWN)
@@ -315,14 +323,14 @@ class Player extends FlxSprite
 				deadVy = speedLevel;
 			}
 		}
-		
+
 		if (y < 32 && deadVy < 0)
 		{
 			if (facing == FlxObject.RIGHT)
 			{
 				deadVx = -1 * deadVy;
 				deadVy = 0;
-				
+
 				x = 32;
 				y = 16;
 			}
@@ -330,7 +338,7 @@ class Player extends FlxSprite
 			{
 				deadVx = deadVy;
 				deadVy = 0;
-				
+
 				x = Reg.PS.getWidth() - 48;
 				y = 16;
 			}
@@ -341,7 +349,7 @@ class Player extends FlxSprite
 			{
 				deadVx = deadVy;
 				deadVy = 0;
-				
+
 				x = 32;
 				y = Reg.PS.getHeight() - 16;
 			}
@@ -349,7 +357,7 @@ class Player extends FlxSprite
 			{
 				deadVx = -1 * deadVy;
 				deadVy = 0;
-				
+
 				x = Reg.PS.getWidth() - 48;
 				y = Reg.PS.getHeight() - 16;
 			}
@@ -360,7 +368,7 @@ class Player extends FlxSprite
 			{
 				deadVy = -1 * deadVx;
 				deadVx = 0;
-				
+
 				x = 16;
 				y = 32;
 			}
@@ -368,7 +376,7 @@ class Player extends FlxSprite
 			{
 				deadVy = deadVx;
 				deadVx = 0;
-				
+
 				x = 16;
 				y = Reg.PS.getHeight() - 32;
 			}
@@ -379,7 +387,7 @@ class Player extends FlxSprite
 			{
 				deadVy = deadVx;
 				deadVx = 0;
-				
+
 				x = Reg.PS.getWidth() - 32;
 				y = 32;
 			}
@@ -387,12 +395,12 @@ class Player extends FlxSprite
 			{
 				deadVy = -1 * deadVx;
 				deadVx = 0;
-				
+
 				x = Reg.PS.getWidth() - 32;
 				y = Reg.PS.getHeight() - 32;
 			}
 		}
-		
+
 		if (x == 16)
 		{
 			facing = FlxObject.RIGHT;
@@ -413,11 +421,11 @@ class Player extends FlxSprite
 			facing = FlxObject.DOWN;
 			animation.play("dead-down");
 		}
-		
+
 		x += deadVx;
 		y += deadVy;
 	}
-	
+
 	private function move():Void
 	{
 		if (controller.pressed(PlayerController.LEFT_BUTTON))
@@ -459,5 +467,5 @@ class Player extends FlxSprite
 			}
 		}
 	}
-	
+
 }
